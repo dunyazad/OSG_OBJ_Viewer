@@ -300,29 +300,52 @@ void OpenSceneGraph::InitScene()
 	osg::ref_ptr<osg::Node> axisHandleX = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleX.OBJ"); m_pAxisHandles->addChild(axisHandleX);
 	osg::ref_ptr<osg::Node> axisHandleY = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleY.OBJ"); m_pAxisHandles->addChild(axisHandleY);
 	osg::ref_ptr<osg::Node> axisHandleZ = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleZ.OBJ"); m_pAxisHandles->addChild(axisHandleZ);
+
+
+
+
+	osg::Geode *geode = new osg::Geode;
+	osg::Geometry *g = new osg::Geometry;
+	osg::Vec3Array *v = new osg::Vec3Array;
+
+	v->push_back(osg::Vec3(0,0,0));
+	v->push_back(osg::Vec3(100,0,0));
+	v->push_back(osg::Vec3(0,0,0));
+	v->push_back(osg::Vec3(0,0,100));
+
+	osg::DrawArrays *da = new 
+	osg::DrawArrays(osg::PrimitiveSet::LINES,0,v->size());
+
+	g->setVertexArray( v);
+	g->addPrimitiveSet( da);
+
+	geode->addDrawable( g);
+	geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+	m_pRoot->addChild(geode);
 }
 
 void OpenSceneGraph::InitLight()
 {
-	//osg::Light *light = new osg::Light();
-	//light->setLightNum(0);
-	//light->setPosition(osg::Vec4(0.0, 0.0, 0.0, 1.0));
-	//light->setDiffuse(osg::Vec4(1.0, 1.0, 1.0, 1.0));
-	//light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
-	//light->setAmbient(osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	osg::Light *light = new osg::Light();
+	light->setLightNum(0);
+	light->setPosition(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	light->setDiffuse(osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	light->setAmbient(osg::Vec4(2.0, 2.0, 2.0, 2.0));
 
-	//osg::StateSet* lightStateSet = m_pRoot->getOrCreateStateSet();
+	osg::StateSet* lightStateSet = m_pRoot->getOrCreateStateSet();
 
-	//osg::LightSource* lightSource = new osg::LightSource();
-	//lightSource->setLight(light);
-	//lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
-	//lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
+	osg::LightSource* lightSource = new osg::LightSource();
+	lightSource->setLight(light);
+	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
+	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
 
-	//osg::PositionAttitudeTransform *lightTransform = new osg::PositionAttitudeTransform();
-	//lightTransform->addChild(lightSource);
-	//lightTransform->setPosition(osg::Vec3(50, -50, 50));
-	//
-	//m_pRoot->addChild(lightTransform);
+	osg::PositionAttitudeTransform *lightTransform = new osg::PositionAttitudeTransform();
+	lightTransform->addChild(lightSource);
+	lightTransform->setPosition(osg::Vec3(0.0, -100.0, 50.0));
+	
+	m_pRoot->addChild(lightTransform);
 }
 
 void OpenSceneGraph::InitCameraConfig()
@@ -382,7 +405,7 @@ void OpenSceneGraph::InitCameraConfig()
 	camera->setProjectionMatrixAsPerspective(
 		30.0f, static_cast<double>(traits->width)/static_cast<double>(traits->height), 1.0, 1000.0);
 
-	osg::Vec3d eye( 1000.0, 1000.0, 0.0 );
+	osg::Vec3d eye( 0.0, -100.0, 50.0 );
 	osg::Vec3d center( 0.0, 0.0, 0.0 );
 	osg::Vec3d up( 0.0, 0.0, 1.0 );
 
@@ -453,6 +476,7 @@ osg::ref_ptr<osg::Node> OpenSceneGraph::LoadModel(std::string filename)
 	{
 		return nullptr;
 	}
+	//model->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 	// Optimize the model
 	osgUtil::Optimizer optimizer;

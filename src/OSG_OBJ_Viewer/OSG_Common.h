@@ -8,8 +8,7 @@
 #include <osg/MatrixTransform>
 #include <osg/PositionAttitudeTransform>
 #include <osg/ShapeDrawable>
-#include <osgViewer/Viewer>
-#include <osgGA/TrackballManipulator>
+#include <osg/ComputeBoundsVisitor>
 
 
 

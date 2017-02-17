@@ -3,7 +3,192 @@
 #include "stdafx.h"
 #include "OpenSceneGraph.h"
 
-OpenSceneGraph::OpenSceneGraph(HWND hWnd) : m_hWnd(hWnd)
+
+class PickHandler : public osgGA::GUIEventHandler 
+{
+public: 
+	PickHandler() : _mX(0.0),_mY(0.0) {}
+	bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+	{
+		osgViewer::Viewer* viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
+		if (!viewer)
+			return(false);
+
+		switch(ea.getEventType())
+		{
+		case osgGA::GUIEventAdapter::PUSH:
+		case osgGA::GUIEventAdapter::MOVE:
+			{
+				// Record mouse location for the button press
+				//   and move events.
+				_mX = ea.getX();
+				_mY = ea.getY();
+				return( false );
+			}
+		case osgGA::GUIEventAdapter::RELEASE:
+			{
+				// If the mouse hasn't moved since the last
+				//   button press or move event, perform a
+				//   pick. (Otherwise, the trackball
+				//   manipulator will handle it.)
+				if (_mX == ea.getX() && _mY == ea.getY())
+				{
+					if (pick( ea.getXnormalized(),
+						ea.getYnormalized(), viewer ))
+						return( true );
+				}
+				return( false );
+			}    
+
+		default:
+			return( false );
+		}
+	}
+
+	osg::ref_ptr<osg::MatrixTransform> m_pObjectMaipulator;
+
+protected:
+	// Store mouse xy location for button press & move events.
+	float _mX, _mY;
+
+	// Perform a pick operation.
+	bool pick(const double x, const double y, osgViewer::Viewer* viewer)
+	{
+		if (!viewer->getSceneData())
+			// Nothing to pick.
+			return( false );
+
+		double w(0.05), h(0.05);
+		osgUtil::PolytopeIntersector* picker = new osgUtil::PolytopeIntersector(osgUtil::Intersector::PROJECTION, x-w, y-h, x+w, y+h);
+
+		osgUtil::IntersectionVisitor iv(picker);
+		viewer->getCamera()->accept(iv);
+
+		if (picker->containsIntersections())
+		{
+			const osg::NodePath& nodePath = picker->getFirstIntersection().nodePath;
+			//MessageBoxA(nullptr, nodePath.back()->getParent(0)->getName().c_str(), "", MB_OK);
+
+			auto mtm = (osg::MatrixTransform*)nodePath.back()->getParent(0);
+			mtm->setNodeMask(0);
+
+			//osg::ref_ptr<osg::ComputeBoundsVisitor> cbv = new osg::ComputeBoundsVisitor(); 
+			//osg::ref_ptr<osg::MatrixTransform> boundingBoxMt = new osg::MatrixTransform(); 
+			//mtm->accept(*cbv);
+			//osg::BoundingBox bb(cbv->getBoundingBox());
+			//osg::Matrix m = osg::Matrix::translate(mtm->getMatrix() * bb.center());
+			//m_pObjectMaipulator->setMatrix(m);
+
+
+
+			//auto trans = mtm->getMatrix().getTrans();
+			//osg::Matrix m = osg::Matrix::translate(trans);
+			//m_pObjectMaipulator->setMatrix(m);
+
+			
+
+			//const osg::NodePath& nodePath =
+			//	picker->getFirstIntersection().nodePath;
+			//unsigned int idx = nodePath.size();
+			//while (idx--)
+			//{
+			//	// Find the LAST MatrixTransform in the node
+			//	//   path; this will be the MatrixTransform
+			//	//   to attach our callback to.
+			//	osg::MatrixTransform* mt =
+			//		dynamic_cast<osg::MatrixTransform*>(
+			//		nodePath[ idx ] );
+			//	if (mt == NULL)
+			//		continue;
+
+			//	// If we get here, we just found a
+			//	//   MatrixTransform in the nodePath.
+
+			//	if (_selectedNode.valid())
+			//		// Clear the previous selected node's
+			//		//   callback to make it stop spinning.
+			//		_selectedNode->setUpdateCallback( NULL );
+
+			//	_selectedNode = mt;
+			//	_selectedNode->setUpdateCallback( new RotateCB );
+			//	break;
+			//}
+			//if (!_selectedNode.valid())
+			//	osg::notify() << "Pick failed." << std::endl;
+			return true;
+		}
+		//else if (_selectedNode.valid())
+		//{
+		//	_selectedNode->setUpdateCallback( NULL );
+		//	_selectedNode = NULL;
+		//}
+		//return( _selectedNode.valid() );
+
+		return false;
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OpenSceneGraph::OpenSceneGraph(HWND hWnd) : m_hWnd(hWnd), m_pCameraController(nullptr)
 {
 }
 
@@ -28,6 +213,18 @@ void OpenSceneGraph::Initialize()
 
 void OpenSceneGraph::InitManipulators()
 {
+	// Create a trackball manipulator
+	m_pTrackballManipulator = new osgGA::TrackballManipulator();
+	m_pTrackballManipulator->setTrackballSize(50);
+
+	// Create a Manipulator Switcher
+	m_pKeyswitchManipulator = new osgGA::KeySwitchMatrixManipulator;
+
+	// Add our trackball manipulator to the switcher
+	m_pKeyswitchManipulator->addMatrixManipulator( '1', "Trackball", m_pTrackballManipulator.get());
+
+	// Init the switcher to the first manipulator (in this case the only manipulator)
+	m_pKeyswitchManipulator->selectMatrixManipulator(0);  // Zero based index Value
 }
 
 
@@ -43,51 +240,51 @@ void OpenSceneGraph::InitScene()
 
 
 	// Load the Model from the model name
-	//m_pTeeth = new osg::MatrixTransform;
-	//m_pRoot->addChild(m_pTeeth.get());
-	//osg::ref_ptr<osg::Node> tooth11 = this->LoadModel("..\\..\\res\\3D Tooth\\t11_7780.OBJ"); m_pTeeth->addChild(tooth11);
-	//osg::ref_ptr<osg::Node> tooth12 = this->LoadModel("..\\..\\res\\3D Tooth\\t12_7780.OBJ"); m_pTeeth->addChild(tooth12);
-	//osg::ref_ptr<osg::Node> tooth13 = this->LoadModel("..\\..\\res\\3D Tooth\\t13_7780.OBJ"); m_pTeeth->addChild(tooth13);
-	//osg::ref_ptr<osg::Node> tooth14 = this->LoadModel("..\\..\\res\\3D Tooth\\t14_7780.OBJ"); m_pTeeth->addChild(tooth14);
-	//osg::ref_ptr<osg::Node> tooth15 = this->LoadModel("..\\..\\res\\3D Tooth\\t15_7780.OBJ"); m_pTeeth->addChild(tooth15);
-	//osg::ref_ptr<osg::Node> tooth16 = this->LoadModel("..\\..\\res\\3D Tooth\\t16_7780.OBJ"); m_pTeeth->addChild(tooth16);
-	//osg::ref_ptr<osg::Node> tooth17 = this->LoadModel("..\\..\\res\\3D Tooth\\t17_7780.OBJ"); m_pTeeth->addChild(tooth17);
+	m_pTeeth = new osg::MatrixTransform;
+	m_pRoot->addChild(m_pTeeth.get());
+	osg::ref_ptr<osg::Node> tooth11 = this->LoadModel("..\\..\\res\\3D Tooth\\t11_7780.OBJ"); m_pTeeth->addChild(tooth11);
+	osg::ref_ptr<osg::Node> tooth12 = this->LoadModel("..\\..\\res\\3D Tooth\\t12_7780.OBJ"); m_pTeeth->addChild(tooth12);
+	osg::ref_ptr<osg::Node> tooth13 = this->LoadModel("..\\..\\res\\3D Tooth\\t13_7780.OBJ"); m_pTeeth->addChild(tooth13);
+	osg::ref_ptr<osg::Node> tooth14 = this->LoadModel("..\\..\\res\\3D Tooth\\t14_7780.OBJ"); m_pTeeth->addChild(tooth14);
+	osg::ref_ptr<osg::Node> tooth15 = this->LoadModel("..\\..\\res\\3D Tooth\\t15_7780.OBJ"); m_pTeeth->addChild(tooth15);
+	osg::ref_ptr<osg::Node> tooth16 = this->LoadModel("..\\..\\res\\3D Tooth\\t16_7780.OBJ"); m_pTeeth->addChild(tooth16);
+	osg::ref_ptr<osg::Node> tooth17 = this->LoadModel("..\\..\\res\\3D Tooth\\t17_7780.OBJ"); m_pTeeth->addChild(tooth17);
 
-	//osg::ref_ptr<osg::Node> tooth21 = this->LoadModel("..\\..\\res\\3D Tooth\\t21_7780.OBJ"); m_pTeeth->addChild(tooth21);
-	//osg::ref_ptr<osg::Node> tooth22 = this->LoadModel("..\\..\\res\\3D Tooth\\t22_7780.OBJ"); m_pTeeth->addChild(tooth22);
-	//osg::ref_ptr<osg::Node> tooth23 = this->LoadModel("..\\..\\res\\3D Tooth\\t23_7780.OBJ"); m_pTeeth->addChild(tooth23);
-	//osg::ref_ptr<osg::Node> tooth24 = this->LoadModel("..\\..\\res\\3D Tooth\\t24_7780.OBJ"); m_pTeeth->addChild(tooth24);
-	//osg::ref_ptr<osg::Node> tooth25 = this->LoadModel("..\\..\\res\\3D Tooth\\t25_7780.OBJ"); m_pTeeth->addChild(tooth25);
-	//osg::ref_ptr<osg::Node> tooth26 = this->LoadModel("..\\..\\res\\3D Tooth\\t26_7780.OBJ"); m_pTeeth->addChild(tooth26);
-	//osg::ref_ptr<osg::Node> tooth27 = this->LoadModel("..\\..\\res\\3D Tooth\\t27_7780.OBJ"); m_pTeeth->addChild(tooth27);
+	osg::ref_ptr<osg::Node> tooth21 = this->LoadModel("..\\..\\res\\3D Tooth\\t21_7780.OBJ"); m_pTeeth->addChild(tooth21);
+	osg::ref_ptr<osg::Node> tooth22 = this->LoadModel("..\\..\\res\\3D Tooth\\t22_7780.OBJ"); m_pTeeth->addChild(tooth22);
+	osg::ref_ptr<osg::Node> tooth23 = this->LoadModel("..\\..\\res\\3D Tooth\\t23_7780.OBJ"); m_pTeeth->addChild(tooth23);
+	osg::ref_ptr<osg::Node> tooth24 = this->LoadModel("..\\..\\res\\3D Tooth\\t24_7780.OBJ"); m_pTeeth->addChild(tooth24);
+	osg::ref_ptr<osg::Node> tooth25 = this->LoadModel("..\\..\\res\\3D Tooth\\t25_7780.OBJ"); m_pTeeth->addChild(tooth25);
+	osg::ref_ptr<osg::Node> tooth26 = this->LoadModel("..\\..\\res\\3D Tooth\\t26_7780.OBJ"); m_pTeeth->addChild(tooth26);
+	osg::ref_ptr<osg::Node> tooth27 = this->LoadModel("..\\..\\res\\3D Tooth\\t27_7780.OBJ"); m_pTeeth->addChild(tooth27);
 
-	//osg::ref_ptr<osg::Node> tooth31 = this->LoadModel("..\\..\\res\\3D Tooth\\t31_7780.OBJ"); m_pTeeth->addChild(tooth31);
-	//osg::ref_ptr<osg::Node> tooth32 = this->LoadModel("..\\..\\res\\3D Tooth\\t32_7780.OBJ"); m_pTeeth->addChild(tooth32);
-	//osg::ref_ptr<osg::Node> tooth33 = this->LoadModel("..\\..\\res\\3D Tooth\\t33_7780.OBJ"); m_pTeeth->addChild(tooth33);
-	//osg::ref_ptr<osg::Node> tooth34 = this->LoadModel("..\\..\\res\\3D Tooth\\t34_7780.OBJ"); m_pTeeth->addChild(tooth34);
-	//osg::ref_ptr<osg::Node> tooth35 = this->LoadModel("..\\..\\res\\3D Tooth\\t35_7780.OBJ"); m_pTeeth->addChild(tooth35);
-	//osg::ref_ptr<osg::Node> tooth36 = this->LoadModel("..\\..\\res\\3D Tooth\\t36_7780.OBJ"); m_pTeeth->addChild(tooth36);
-	//osg::ref_ptr<osg::Node> tooth37 = this->LoadModel("..\\..\\res\\3D Tooth\\t37_7780.OBJ"); m_pTeeth->addChild(tooth37);
+	osg::ref_ptr<osg::Node> tooth31 = this->LoadModel("..\\..\\res\\3D Tooth\\t31_7780.OBJ"); m_pTeeth->addChild(tooth31);
+	osg::ref_ptr<osg::Node> tooth32 = this->LoadModel("..\\..\\res\\3D Tooth\\t32_7780.OBJ"); m_pTeeth->addChild(tooth32);
+	osg::ref_ptr<osg::Node> tooth33 = this->LoadModel("..\\..\\res\\3D Tooth\\t33_7780.OBJ"); m_pTeeth->addChild(tooth33);
+	osg::ref_ptr<osg::Node> tooth34 = this->LoadModel("..\\..\\res\\3D Tooth\\t34_7780.OBJ"); m_pTeeth->addChild(tooth34);
+	osg::ref_ptr<osg::Node> tooth35 = this->LoadModel("..\\..\\res\\3D Tooth\\t35_7780.OBJ"); m_pTeeth->addChild(tooth35);
+	osg::ref_ptr<osg::Node> tooth36 = this->LoadModel("..\\..\\res\\3D Tooth\\t36_7780.OBJ"); m_pTeeth->addChild(tooth36);
+	osg::ref_ptr<osg::Node> tooth37 = this->LoadModel("..\\..\\res\\3D Tooth\\t37_7780.OBJ"); m_pTeeth->addChild(tooth37);
 
-	//osg::ref_ptr<osg::Node> tooth41 = this->LoadModel("..\\..\\res\\3D Tooth\\t41_7780.OBJ"); m_pTeeth->addChild(tooth41);
-	//osg::ref_ptr<osg::Node> tooth42 = this->LoadModel("..\\..\\res\\3D Tooth\\t42_7780.OBJ"); m_pTeeth->addChild(tooth42);
-	//osg::ref_ptr<osg::Node> tooth43 = this->LoadModel("..\\..\\res\\3D Tooth\\t43_7780.OBJ"); m_pTeeth->addChild(tooth43);
-	//osg::ref_ptr<osg::Node> tooth44 = this->LoadModel("..\\..\\res\\3D Tooth\\t44_7780.OBJ"); m_pTeeth->addChild(tooth44);
-	//osg::ref_ptr<osg::Node> tooth45 = this->LoadModel("..\\..\\res\\3D Tooth\\t45_7780.OBJ"); m_pTeeth->addChild(tooth45);
-	//osg::ref_ptr<osg::Node> tooth46 = this->LoadModel("..\\..\\res\\3D Tooth\\t46_7780.OBJ"); m_pTeeth->addChild(tooth46);
-	//osg::ref_ptr<osg::Node> tooth47 = this->LoadModel("..\\..\\res\\3D Tooth\\t47_7780.OBJ"); m_pTeeth->addChild(tooth47);
+	osg::ref_ptr<osg::Node> tooth41 = this->LoadModel("..\\..\\res\\3D Tooth\\t41_7780.OBJ"); m_pTeeth->addChild(tooth41);
+	osg::ref_ptr<osg::Node> tooth42 = this->LoadModel("..\\..\\res\\3D Tooth\\t42_7780.OBJ"); m_pTeeth->addChild(tooth42);
+	osg::ref_ptr<osg::Node> tooth43 = this->LoadModel("..\\..\\res\\3D Tooth\\t43_7780.OBJ"); m_pTeeth->addChild(tooth43);
+	osg::ref_ptr<osg::Node> tooth44 = this->LoadModel("..\\..\\res\\3D Tooth\\t44_7780.OBJ"); m_pTeeth->addChild(tooth44);
+	osg::ref_ptr<osg::Node> tooth45 = this->LoadModel("..\\..\\res\\3D Tooth\\t45_7780.OBJ"); m_pTeeth->addChild(tooth45);
+	osg::ref_ptr<osg::Node> tooth46 = this->LoadModel("..\\..\\res\\3D Tooth\\t46_7780.OBJ"); m_pTeeth->addChild(tooth46);
+	osg::ref_ptr<osg::Node> tooth47 = this->LoadModel("..\\..\\res\\3D Tooth\\t47_7780.OBJ"); m_pTeeth->addChild(tooth47);
 
-	//osg::Matrix m1, m2;
-	//m1 = osg::Matrix::rotate(osg::DegreesToRadians(-90.0f), 1, 0, 0);
-	//m2 = osg::Matrix::rotate(osg::DegreesToRadians(-90.0f), 0, 0, 1);
-	//m_pTeeth->setMatrix(m1 * m2);
+	osg::Matrix m1, m2;
+	m1 = osg::Matrix::rotate(osg::DegreesToRadians(-90.0f), 1, 0, 0);
+	m2 = osg::Matrix::rotate(osg::DegreesToRadians(-90.0f), 0, 0, 1);
+	m_pTeeth->setMatrix(m1 * m2);
 
-	m_pF15K = new osg::MatrixTransform;
-	m_pRoot->addChild(m_pF15K.get());
-	osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.OBJ"); m_pF15K->addChild(m_pF15KModel);
-	m_pF15KModel->setName("F-15K");
-	osg::Matrix scale = osg::Matrix::scale(0.005, 0.005, 0.005);
-	m_pF15K->setMatrix(scale);
+	//m_pF15K = new osg::MatrixTransform;
+	//m_pRoot->addChild(m_pF15K.get());
+	//osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.OBJ"); m_pF15K->addChild(m_pF15KModel);
+	//m_pF15KModel->setName("F-15K");
+	//osg::Matrix scale = osg::Matrix::scale(0.005, 0.005, 0.005);
+	//m_pF15K->setMatrix(scale);
 
 
 
@@ -200,7 +397,10 @@ void OpenSceneGraph::InitCameraConfig()
 	mViewer = new osgViewer::Viewer();
 
 	// Add a Stats Handler to the viewer
-	//mViewer->addEventHandler(new osgViewer::StatsHandler);
+	mViewer->addEventHandler(new osgViewer::StatsHandler);
+	auto pickHandler = new PickHandler();
+	pickHandler->m_pObjectMaipulator = m_pObjectMaipulator;
+	mViewer->addEventHandler(pickHandler);
 
 	// Get the current window size
 	::GetWindowRect(m_hWnd, &windowRect);
@@ -247,9 +447,9 @@ void OpenSceneGraph::InitCameraConfig()
 	camera->setProjectionMatrixAsPerspective(
 		30.0f, static_cast<double>(traits->width)/static_cast<double>(traits->height), 1.0, 1000.0);
 
-	m_pCameraController = new CameraController(mViewer, m_pRoot, camera);
+	//m_pCameraController = new CameraController(mViewer, m_pRoot, camera);
 
-	//osg::Vec3d eye( 0.0, -100.0, 50.0 );
+	//osg::Vec3d eye( 0.0, -10.0, 50.0 );
 	//osg::Vec3d center( 0.0, 0.0, 0.0 );
 	//osg::Vec3d up( 0.0, 0.0, 1.0 );
 
@@ -258,6 +458,8 @@ void OpenSceneGraph::InitCameraConfig()
 	// Add the Camera to the Viewer
 	//mViewer->addSlave(camera.get());
 	mViewer->setCamera(camera.get());
+
+	mViewer->setCameraManipulator(m_pKeyswitchManipulator.get());
 
 	// Set the Scene Data
 	mViewer->setSceneData(m_pRoot.get());
@@ -309,7 +511,7 @@ AfxMessageBox("Exit Rendering Thread");
 _endthread();
 }*/
 
-osg::ref_ptr<osg::Node> OpenSceneGraph::LoadModel(std::string filename)
+osg::ref_ptr<osg::MatrixTransform> OpenSceneGraph::LoadModel(std::string filename)
 {
 	//// Load the Model from the model name
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(filename);
@@ -318,61 +520,65 @@ osg::ref_ptr<osg::Node> OpenSceneGraph::LoadModel(std::string filename)
 		return nullptr;
 	}
 	//model->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	model->setName(filename);
 
 	// Optimize the model
 	osgUtil::Optimizer optimizer;
 	optimizer.optimize(model.get());
 	optimizer.reset();
 
-	return model;
+	osg::ref_ptr<osg::MatrixTransform> transform = new osg::MatrixTransform();
+	transform->addChild(model);
+
+	return transform;
 }
 
 void OpenSceneGraph::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	m_pCameraController->OnKeyDown(nChar, nRepCnt, nFlags);
+	//m_pCameraController->OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void OpenSceneGraph::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	m_pCameraController->OnKeyUp(nChar, nRepCnt, nFlags);
+	//m_pCameraController->OnKeyUp(nChar, nRepCnt, nFlags);
 }
 
 void OpenSceneGraph::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	m_pCameraController->OnLButtonDown(nFlags, point);
+	//m_pCameraController->OnLButtonDown(nFlags, point);
 }
 
 void OpenSceneGraph::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	m_pCameraController->OnLButtonUp(nFlags, point);
+	//m_pCameraController->OnLButtonUp(nFlags, point);
 }
 
 void OpenSceneGraph::OnMButtonDown(UINT nFlags, CPoint point)
 {
-	m_pCameraController->OnMButtonDown(nFlags, point);
+	//m_pCameraController->OnMButtonDown(nFlags, point);
 }
 
 void OpenSceneGraph::OnMButtonUp(UINT nFlags, CPoint point)
 {
-	m_pCameraController->OnMButtonUp(nFlags, point);
+	//m_pCameraController->OnMButtonUp(nFlags, point);
 }
 
 void OpenSceneGraph::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	m_pCameraController->OnRButtonDown(nFlags, point);
+	//m_pCameraController->OnRButtonDown(nFlags, point);
 }
 
 void OpenSceneGraph::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	m_pCameraController->OnRButtonUp(nFlags, point);
+	//m_pCameraController->OnRButtonUp(nFlags, point);
 }
 
 void OpenSceneGraph::OnMouseMove(UINT nFlags, CPoint point)
 {
-	m_pCameraController->OnMouseMove(nFlags, point);
+	//m_pCameraController->OnMouseMove(nFlags, point);
 }
 
 void OpenSceneGraph::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	m_pCameraController->OnMouseWheel(nFlags, zDelta, pt);
+	//m_pCameraController->OnMouseWheel(nFlags, zDelta, pt);
 }

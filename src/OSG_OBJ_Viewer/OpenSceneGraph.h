@@ -26,7 +26,7 @@ public:
 
 	osgViewer::Viewer* getViewer() { return mViewer; }
 
-	osg::ref_ptr<osg::Node> LoadModel(std::string filename);
+	osg::ref_ptr<osg::MatrixTransform> LoadModel(std::string filename);
 
 
 	void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -46,6 +46,8 @@ private:
 	HWND m_hWnd;
 	osgViewer::Viewer* mViewer;
 	osg::ref_ptr<osg::Group> m_pRoot;
+	osg::ref_ptr<osgGA::TrackballManipulator> m_pTrackballManipulator;
+	osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> m_pKeyswitchManipulator;
 	osg::ref_ptr<osg::MatrixTransform> m_pTeeth;
 	osg::ref_ptr<osg::MatrixTransform> m_pF15K;
 	

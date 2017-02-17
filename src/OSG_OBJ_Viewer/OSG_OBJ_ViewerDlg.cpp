@@ -67,6 +67,16 @@ BEGIN_MESSAGE_MAP(OpenSceneGraph_OBJ_ViewerDlg, CDialogEx)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
+	ON_WM_KEYDOWN()
+	ON_WM_KEYUP()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_RBUTTONDOWN()
+	ON_WM_RBUTTONUP()
+	ON_WM_MOUSEMOVE()
+	ON_WM_MOUSEWHEEL()
+	ON_WM_MBUTTONDOWN()
+	ON_WM_MBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -164,4 +174,94 @@ void OpenSceneGraph_OBJ_ViewerDlg::OnPaint()
 HCURSOR OpenSceneGraph_OBJ_ViewerDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnKeyDown(nChar, nRepCnt, nFlags);
+
+	CDialogEx::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnKeyUp(nChar, nRepCnt, nFlags);
+
+	CDialogEx::OnKeyUp(nChar, nRepCnt, nFlags);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnLButtonDown(nFlags, point);
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnLButtonUp(nFlags, point);
+
+	CDialogEx::OnLButtonUp(nFlags, point);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnMButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnMButtonDown(nFlags, point);
+
+	CDialogEx::OnMButtonDown(nFlags, point);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnMButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnMButtonUp(nFlags, point);
+
+	CDialogEx::OnMButtonUp(nFlags, point);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnRButtonDown(nFlags, point);
+
+	CDialogEx::OnRButtonDown(nFlags, point);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnRButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnRButtonUp(nFlags, point);
+
+	CDialogEx::OnRButtonUp(nFlags, point);
+}
+
+
+void OpenSceneGraph_OBJ_ViewerDlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnMouseMove(nFlags, point);
+
+	CDialogEx::OnMouseMove(nFlags, point);
+}
+
+
+BOOL OpenSceneGraph_OBJ_ViewerDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_pOSG->OnMouseWheel(nFlags, zDelta, pt);
+
+	return CDialogEx::OnMouseWheel(nFlags, zDelta, pt);
 }

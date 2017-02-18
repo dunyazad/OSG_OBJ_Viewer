@@ -59,7 +59,7 @@ protected:
 			return( false );
 
 		double w(0.05), h(0.05);
-		osgUtil::PolytopeIntersector* picker = new osgUtil::PolytopeIntersector(osgUtil::Intersector::PROJECTION, x-w, y-h, x+w, y+h);
+		osgUtil::LineSegmentIntersector* picker = new osgUtil::LineSegmentIntersector(osgUtil::Intersector::PROJECTION, x, y);
 
 		osgUtil::IntersectionVisitor iv(picker);
 		viewer->getCamera()->accept(iv);
@@ -70,64 +70,51 @@ protected:
 			//MessageBoxA(nullptr, nodePath.back()->getParent(0)->getName().c_str(), "", MB_OK);
 
 			auto mtm = (osg::MatrixTransform*)nodePath.back()->getParent(0);
-			mtm->setNodeMask(0);
+			//mtm->setNodeMask(0);
 
-			//osg::ref_ptr<osg::ComputeBoundsVisitor> cbv = new osg::ComputeBoundsVisitor(); 
-			//osg::ref_ptr<osg::MatrixTransform> boundingBoxMt = new osg::MatrixTransform(); 
-			//mtm->accept(*cbv);
-			//osg::BoundingBox bb(cbv->getBoundingBox());
-			//osg::Matrix m = osg::Matrix::translate(mtm->getMatrix() * bb.center());
-			//m_pObjectMaipulator->setMatrix(m);
+			osg::Matrix m = osg::Matrix::translate(picker->getFirstIntersection().getWorldIntersectPoint());
+			m_pObjectMaipulator->setMatrix(m);
+			m_pObjectMaipulator->setNodeMask(0xffffffff);
 
-
-
-			//auto trans = mtm->getMatrix().getTrans();
-			//osg::Matrix m = osg::Matrix::translate(trans);
-			//m_pObjectMaipulator->setMatrix(m);
-
-			
-
-			//const osg::NodePath& nodePath =
-			//	picker->getFirstIntersection().nodePath;
-			//unsigned int idx = nodePath.size();
-			//while (idx--)
-			//{
-			//	// Find the LAST MatrixTransform in the node
-			//	//   path; this will be the MatrixTransform
-			//	//   to attach our callback to.
-			//	osg::MatrixTransform* mt =
-			//		dynamic_cast<osg::MatrixTransform*>(
-			//		nodePath[ idx ] );
-			//	if (mt == NULL)
-			//		continue;
-
-			//	// If we get here, we just found a
-			//	//   MatrixTransform in the nodePath.
-
-			//	if (_selectedNode.valid())
-			//		// Clear the previous selected node's
-			//		//   callback to make it stop spinning.
-			//		_selectedNode->setUpdateCallback( NULL );
-
-			//	_selectedNode = mt;
-			//	_selectedNode->setUpdateCallback( new RotateCB );
-			//	break;
-			//}
-			//if (!_selectedNode.valid())
-			//	osg::notify() << "Pick failed." << std::endl;
 			return true;
+		} else {
+			m_pObjectMaipulator->setNodeMask(0);
 		}
-		//else if (_selectedNode.valid())
-		//{
-		//	_selectedNode->setUpdateCallback( NULL );
-		//	_selectedNode = NULL;
-		//}
-		//return( _selectedNode.valid() );
 
 		return false;
 	}
 };
 
+
+
+class KeyboardEventHandler : public osgGA::GUIEventHandler
+{
+public:
+	virtual bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter&);
+	osgViewer::Viewer* m_pViewer;
+};
+
+bool KeyboardEventHandler::handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa)
+{
+	switch(ea.getEventType())
+	{
+	case(osgGA::GUIEventAdapter::KEYDOWN):
+		{
+			switch(ea.getKey())
+			{
+			case 's':
+				AfxMessageBox(L"s");
+				m_pViewer->setKeyEventSetsDone(0); 
+				return false;
+				break;
+			default:
+				return false;
+			} 
+		}
+	default:
+		return false;
+	}
+}
 
 
 
@@ -299,9 +286,7 @@ void OpenSceneGraph::InitScene()
 
 	m_pObjectMaipulator = new osg::MatrixTransform();
 	m_pRoot->addChild(m_pObjectMaipulator.get());
-	osg::Matrix mTemp;
-	mTemp = osg::Matrix::translate(50, -50, 50);
-	m_pObjectMaipulator->setMatrix(mTemp);
+	m_pObjectMaipulator->setMatrix(osg::Matrix::translate(50, -50, 50));
 
 
 
@@ -325,7 +310,7 @@ void OpenSceneGraph::InitScene()
 	osg::ref_ptr<osg::Node> axisHandleX = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleX.OBJ"); m_pAxisHandles->addChild(axisHandleX);
 	osg::ref_ptr<osg::Node> axisHandleY = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleY.OBJ"); m_pAxisHandles->addChild(axisHandleY);
 	osg::ref_ptr<osg::Node> axisHandleZ = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleZ.OBJ"); m_pAxisHandles->addChild(axisHandleZ);
-
+	m_pAxisHandles->setMatrix(osg::Matrix::scale(2, 2, 2));
 
 
 
@@ -397,10 +382,14 @@ void OpenSceneGraph::InitCameraConfig()
 	mViewer = new osgViewer::Viewer();
 
 	// Add a Stats Handler to the viewer
-	mViewer->addEventHandler(new osgViewer::StatsHandler);
+	//mViewer->addEventHandler(new osgViewer::StatsHandler);
 	auto pickHandler = new PickHandler();
 	pickHandler->m_pObjectMaipulator = m_pObjectMaipulator;
 	mViewer->addEventHandler(pickHandler);
+
+	auto keyHandler = new KeyboardEventHandler();
+	keyHandler->m_pViewer = this->mViewer;
+	mViewer->addEventHandler(keyHandler);
 
 	// Get the current window size
 	::GetWindowRect(m_hWnd, &windowRect);

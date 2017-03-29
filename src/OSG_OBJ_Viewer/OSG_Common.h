@@ -25,6 +25,7 @@
 #include <osg/TexGen>
 #include <osg/Geometry>
 #include <osg/Texture2D>
+#include <osg/Material>
 #include <osg/AutoTransform>
 #include <osg/Notify>
 

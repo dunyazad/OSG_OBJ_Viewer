@@ -93,6 +93,30 @@ void OpenSceneGraph::InitModels()
 			for(int j = 0; j < geode->getNumChildren(); j++) {
 				auto geometry = geode->getChild(j)->asGeometry();
 				if(nullptr != geometry) {
+					osg::StateSet* ss = geometry->getOrCreateStateSet();				
+					ss->setMode(GL_LIGHTING,osg::StateAttribute::ON);
+
+					osg::ref_ptr<osg::Material> material = new osg::Material;
+					material->setDiffuse (osg::Material::FRONT_AND_BACK, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+					material->setAmbient(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+					material->setSpecular(osg::Material::FRONT, osg::Vec4(0.15, 0.15, 0.15, 1.0));
+					material->setEmission(osg::Material::FRONT, osg::Vec4(0.4, 0.4, 0.4, 1.0));
+					/*
+					pMat->setDiffuse (osg::Material::FRONT_AND_BACK, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+					pMat->setAmbient(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+					pMat->setSpecular(osg::Material::FRONT, osg::Vec4(0.15, 0.15, 0.15, 1.0));
+					*/
+					ss->setAttributeAndModes(material, osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE);		
+
+					osg::ref_ptr<osg::Texture2D> texture = (osg::Texture2D*) ss->getTextureAttribute(0, osg::StateAttribute::TEXTURE); 
+					if(texture)
+					{
+						texture->setInternalFormatMode(osg::Texture2D::USE_S3TC_DXT1_COMPRESSION);
+						texture->setUnRefImageDataAfterApply(true);
+						
+						osgDB::writeImageFile(*texture->getImage(), "D:\\result.bmp");
+					}
+
 					osg::Vec3Array* va = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
 					if(nullptr != va) {
 						auto vi = va->begin();

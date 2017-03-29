@@ -11,7 +11,7 @@ public:
 	~OpenSceneGraph();
 
 	void Initialize();
-	void InitManipulators();
+	void InitModels();
 	void InitScene();
 	void InitCameraConfig();
 	void InitLight();
@@ -55,4 +55,7 @@ private:
 	osg::ref_ptr<osg::MatrixTransform> m_pAxisHandles;
 
 	CameraController* m_pCameraController;
+
+	osg::ref_ptr<osg::Camera> m_pCameraMain;
+	osg::ref_ptr<osg::Camera> m_pCameraSub;
 };

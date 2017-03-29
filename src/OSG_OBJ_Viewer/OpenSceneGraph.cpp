@@ -21,26 +21,18 @@ OpenSceneGraph::~OpenSceneGraph()
 void OpenSceneGraph::Initialize()
 {
 	InitScene();
-	InitLight();
-	InitManipulators();
 	InitCameraConfig();
+	InitLight();
+	InitModels();
 }
 
-void OpenSceneGraph::InitManipulators()
+void OpenSceneGraph::InitModels()
 {
-}
-
-
-void OpenSceneGraph::InitScene()
-{
-	m_pRoot = new osg::Group();
-
-	osg::Box* cube = new osg::Box(osg::Vec3(50, -50, 50), 1.0f);
-	osg::ShapeDrawable* cubeDrawable = new osg::ShapeDrawable(cube);
-	osg::Geode* cubeGeode = new osg::Geode();
-	cubeGeode->addDrawable(cubeDrawable);
-	m_pRoot->addChild(cubeGeode);
-
+	//osg::Box* cube = new osg::Box(osg::Vec3(50, -50, 50), 1.0f);
+	//osg::ShapeDrawable* cubeDrawable = new osg::ShapeDrawable(cube);
+	//osg::Geode* cubeGeode = new osg::Geode();
+	//cubeGeode->addDrawable(cubeDrawable);
+	//m_pRoot->addChild(cubeGeode);
 
 	// Load the Model from the model name
 	//m_pTeeth = new osg::MatrixTransform;
@@ -84,16 +76,51 @@ void OpenSceneGraph::InitScene()
 
 	m_pF15K = new osg::MatrixTransform;
 	m_pRoot->addChild(m_pF15K.get());
-	osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.OBJ"); m_pF15K->addChild(m_pF15KModel);
+	//osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.OBJ"); m_pF15K->addChild(m_pF15KModel);
+	osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\Capsule\\capsule.obj"); m_pF15K->addChild(m_pF15KModel);
 	m_pF15KModel->setName("F-15K");
-	osg::Matrix scale = osg::Matrix::scale(0.005, 0.005, 0.005);
-	m_pF15K->setMatrix(scale);
+	//osg::Matrix scale = osg::Matrix::scale(0.005, 0.005, 0.005);
+	//m_pF15K->setMatrix(scale);
 
 
+	auto rotation = osg::Matrix::rotate(45 * osg::PI/180, osg::Vec3(0, 0, 1));
 
+	auto group = m_pF15KModel->asGroup();
+	for(int i = 0; i < group->getNumChildren(); i++)
+	{
+		auto geode = group->getChild(i)->asGeode();
+		if(nullptr != geode) {
+			for(int j = 0; j < geode->getNumChildren(); j++) {
+				auto geometry = geode->getChild(j)->asGeometry();
+				if(nullptr != geometry) {
+					osg::Vec3Array* va = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
+					if(nullptr != va) {
+						auto vi = va->begin();
+						auto ve = va->end();
+						for(; vi != ve; vi++) {
+							(*vi) = (*vi) * rotation;
+						}
+					}
+
+					osg::Vec3Array* na = dynamic_cast<osg::Vec3Array*>(geometry->getNormalArray());
+					if(nullptr != na) {
+						auto ni = na->begin();
+						auto ne = na->end();
+						for(; ni != ne; ni++) {
+							(*ni) = (*ni) * rotation;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if(!osgDB::writeNodeFile(*m_pF15KModel, "D:\\result.obj")) {
+		MessageBox(nullptr, L"Error", L"Error", MB_OK);
+	}
 
 	m_pAxisIndicator = new osg::MatrixTransform();
-	m_pRoot->addChild(m_pAxisIndicator.get());
+	m_pCameraSub->addChild(m_pAxisIndicator.get());
 
 	osg::ref_ptr<osg::Node> axisIndicatorX = this->LoadModel("..\\..\\res\\Axes\\AxisXPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorX);
 	osg::ref_ptr<osg::Node> axisIndicatorY = this->LoadModel("..\\..\\res\\Axes\\AxisYPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorY);
@@ -151,6 +178,12 @@ void OpenSceneGraph::InitScene()
 	//geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 	//m_pRoot->addChild(geode);
+}
+
+
+void OpenSceneGraph::InitScene()
+{
+	m_pRoot = new osg::Group();
 }
 
 void OpenSceneGraph::InitLight()
@@ -228,10 +261,10 @@ void OpenSceneGraph::InitCameraConfig()
 	osg::GraphicsContext* gc = osg::GraphicsContext::createGraphicsContext(traits.get());
 
 	// Init Master Camera for this View
-	osg::ref_ptr<osg::Camera> camera = mViewer->getCamera();
+	m_pCameraMain = mViewer->getCamera();
 
 	// Assign Graphics Context to the Camera
-	camera->setGraphicsContext(gc);
+	m_pCameraMain->setGraphicsContext(gc);
 
 	traits->x = 0;
 	traits->y = 0;
@@ -239,15 +272,31 @@ void OpenSceneGraph::InitCameraConfig()
 	traits->height = clientRect.bottom - clientRect.top;
 
 	// Set the viewport for the Camera
-	camera->setViewport(new osg::Viewport(traits->x, traits->y, traits->width, traits->height));
+	m_pCameraMain->setViewport(new osg::Viewport(traits->x, traits->y, traits->width, traits->height));
 
 	// Set projection matrix and camera attribtues
-	camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	camera->setClearColor(osg::Vec4f(0.3f, 0.5f, 0.7f, 1.0f));
-	camera->setProjectionMatrixAsPerspective(
+	m_pCameraMain->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	m_pCameraMain->setClearColor(osg::Vec4f(0.3f, 0.5f, 0.7f, 1.0f));
+	m_pCameraMain->setProjectionMatrixAsPerspective(
 		30.0f, static_cast<double>(traits->width)/static_cast<double>(traits->height), 1.0, 1000.0);
 
-	m_pCameraController = new CameraController(mViewer, m_pRoot, camera);
+	m_pCameraController = new CameraController(mViewer, m_pRoot, m_pCameraMain);
+
+	m_pCameraSub = new osg::Camera();
+	m_pCameraSub->setViewport(new osg::Viewport(traits->x, traits->y, traits->width, traits->height));
+
+	// Set projection matrix and camera attribtues
+	m_pCameraSub->setClearMask(GL_DEPTH_BUFFER_BIT);
+	m_pCameraSub->setRenderOrder(osg::Camera::POST_RENDER, 0);
+	m_pCameraSub->setClearColor(osg::Vec4f(0.3f, 0.5f, 0.7f, 1.0f));
+	m_pCameraSub->setProjectionMatrixAsPerspective(
+		30.0f, static_cast<double>(traits->width)/static_cast<double>(traits->height), 1.0, 1000.0);
+
+
+	//rt->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT); 
+	//rt->attach(osg::Camera::COLOR_BUFFER, tex); 
+	//rt->setClearMask(0); 
+
 
 	//osg::Vec3d eye( 0.0, -100.0, 50.0 );
 	//osg::Vec3d center( 0.0, 0.0, 0.0 );
@@ -256,8 +305,8 @@ void OpenSceneGraph::InitCameraConfig()
 	//camera->setViewMatrixAsLookAt( eye, center, up );
 
 	// Add the Camera to the Viewer
-	//mViewer->addSlave(camera.get());
-	mViewer->setCamera(camera.get());
+	mViewer->setCamera(m_pCameraMain.get());
+	mViewer->addSlave(m_pCameraSub);
 
 	// Set the Scene Data
 	mViewer->setSceneData(m_pRoot.get());

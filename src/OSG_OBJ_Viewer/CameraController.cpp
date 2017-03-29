@@ -15,13 +15,13 @@ CameraController::CameraController(osgViewer::Viewer* pViewer, osg::Group* pRoot
 
 
 
-	m_pCube = new osg::Box(osg::Vec3(0, 0, 0), 1.0f);
-	m_pCubeDrawable = new osg::ShapeDrawable(m_pCube);
-	m_pCubeGeode = new osg::Geode();
-	m_pCubeGeode->addDrawable(m_pCubeDrawable);
-	m_pCubePAT = new osg::PositionAttitudeTransform();
-	m_pCubePAT->addChild(m_pCubeGeode);
-	m_pRoot->addChild(m_pCubePAT);
+	//m_pCube = new osg::Box(osg::Vec3(0, 0, 0), 1.0f);
+	//m_pCubeDrawable = new osg::ShapeDrawable(m_pCube);
+	//m_pCubeGeode = new osg::Geode();
+	//m_pCubeGeode->addDrawable(m_pCubeDrawable);
+	//m_pCubePAT = new osg::PositionAttitudeTransform();
+	//m_pCubePAT->addChild(m_pCubeGeode);
+	//m_pRoot->addChild(m_pCubePAT);
 
 
 	this->ApplyChange();
@@ -151,7 +151,7 @@ void CameraController::ApplyChange()
 
 	m_pCamera->setViewMatrixAsLookAt( m_position, m_target, m_up );
 
-	m_pCubePAT->setPosition(m_target);
+	//m_pCubePAT->setPosition(m_target);
 }
 
 //void pick()

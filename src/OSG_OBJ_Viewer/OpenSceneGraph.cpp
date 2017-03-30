@@ -114,6 +114,9 @@ void OpenSceneGraph::InitModels()
 						texture->setInternalFormatMode(osg::Texture2D::USE_S3TC_DXT1_COMPRESSION);
 						texture->setUnRefImageDataAfterApply(true);
 						
+						auto filename = texture->getImage()->getFileName();
+						//_splitpath(filename.c_str(), )
+
 						osgDB::writeImageFile(*texture->getImage(), "D:\\result.bmp");
 					}
 

@@ -3,6 +3,78 @@
 #include "stdafx.h"
 #include "OpenSceneGraph.h"
 
+#include "tiny_obj_loader.h"
+
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
+
+#include <ctime>
+
+class timerutil {
+ public:
+#ifdef _WIN32
+  typedef DWORD time_t;
+
+  timerutil() { ::timeBeginPeriod(1); }
+  ~timerutil() { ::timeEndPeriod(1); }
+
+  void start() { t_[0] = ::timeGetTime(); }
+  void end() { t_[1] = ::timeGetTime(); }
+
+  time_t sec() { return (time_t)((t_[1] - t_[0]) / 1000); }
+  time_t msec() { return (time_t)((t_[1] - t_[0])); }
+  time_t usec() { return (time_t)((t_[1] - t_[0]) * 1000); }
+  time_t current() { return ::timeGetTime(); }
+
+#else
+#if defined(__unix__) || defined(__APPLE__)
+  typedef unsigned long int time_t;
+
+  void start() { gettimeofday(tv + 0, &tz); }
+  void end() { gettimeofday(tv + 1, &tz); }
+
+  time_t sec() { return (time_t)(tv[1].tv_sec - tv[0].tv_sec); }
+  time_t msec() {
+    return this->sec() * 1000 +
+           (time_t)((tv[1].tv_usec - tv[0].tv_usec) / 1000);
+  }
+  time_t usec() {
+    return this->sec() * 1000000 + (time_t)(tv[1].tv_usec - tv[0].tv_usec);
+  }
+  time_t current() {
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return (time_t)(t.tv_sec * 1000 + t.tv_usec);
+  }
+
+#else  // C timer
+  // using namespace std;
+  typedef clock_t time_t;
+
+  void start() { t_[0] = clock(); }
+  void end() { t_[1] = clock(); }
+
+  time_t sec() { return (time_t)((t_[1] - t_[0]) / CLOCKS_PER_SEC); }
+  time_t msec() { return (time_t)((t_[1] - t_[0]) * 1000 / CLOCKS_PER_SEC); }
+  time_t usec() { return (time_t)((t_[1] - t_[0]) * 1000000 / CLOCKS_PER_SEC); }
+  time_t current() { return (time_t)clock(); }
+
+#endif
+#endif
+
+ private:
+#ifdef _WIN32
+  DWORD t_[2];
+#else
+#if defined(__unix__) || defined(__APPLE__)
+  struct timeval tv[2];
+  struct timezone tz;
+#else
+  time_t t_[2];
+#endif
+#endif
+};
+
 OpenSceneGraph::OpenSceneGraph(HWND hWnd) : m_hWnd(hWnd)
 {
 }
@@ -28,6 +100,53 @@ void OpenSceneGraph::Initialize()
 
 void OpenSceneGraph::InitModels()
 {
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::map<std::string, GLuint> textures;
+
+	timerutil tm;
+
+	tm.start();
+
+	std::string base_dir = "./";
+#ifdef _WIN32
+	base_dir += "\\";
+#else
+	base_dir += "/";
+#endif
+
+	std::string err;
+	bool ret =
+		tinyobj::LoadObj(&attrib, &shapes, &materials, &err, "E:\\Resources\\OBJ\\OOOO R8\\R8.obj", base_dir.c_str());
+	if (!err.empty()) {
+		std::cerr << err << std::endl;
+	}
+
+	tm.end();
+
+	if (!ret) {
+		std::cerr << "Failed to load " << "E:\\Resources\\OBJ\\OOOO R8\\R8.obj" << std::endl;
+		return;
+	}
+
+	printf("Parsing time: %d [ms]\n", (int)tm.msec());
+
+
+
+
+
+
+
+
+	//m_pF15K = new osg::MatrixTransform;
+	//m_pRoot->addChild(m_pF15K.get());
+	////osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.OBJ"); m_pF15K->addChild(m_pF15KModel);
+	//osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("E:\\Resources\\OBJ\\OOOO R8\\R8.obj"); m_pF15K->addChild(m_pF15KModel);
+	//m_pF15KModel->setName("F-15K");
+	////osg::Matrix scale = osg::Matrix::scale(0.005, 0.005, 0.005);
+	////m_pF15K->setMatrix(scale);
+
 	//osg::Box* cube = new osg::Box(osg::Vec3(50, -50, 50), 1.0f);
 	//osg::ShapeDrawable* cubeDrawable = new osg::ShapeDrawable(cube);
 	//osg::Geode* cubeGeode = new osg::Geode();
@@ -74,114 +193,114 @@ void OpenSceneGraph::InitModels()
 	//m2 = osg::Matrix::rotate(osg::DegreesToRadians(-90.0f), 0, 0, 1);
 	//m_pTeeth->setMatrix(m1 * m2);
 
-	m_pF15K = new osg::MatrixTransform;
-	m_pRoot->addChild(m_pF15K.get());
-	//osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.OBJ"); m_pF15K->addChild(m_pF15KModel);
-	osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\Capsule\\capsule.obj"); m_pF15K->addChild(m_pF15KModel);
-	m_pF15KModel->setName("F-15K");
-	//osg::Matrix scale = osg::Matrix::scale(0.005, 0.005, 0.005);
-	//m_pF15K->setMatrix(scale);
+	//m_pF15K = new osg::MatrixTransform;
+	//m_pRoot->addChild(m_pF15K.get());
+	////osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.OBJ"); m_pF15K->addChild(m_pF15KModel);
+	//osg::ref_ptr<osg::Node> m_pF15KModel = this->LoadModel("..\\..\\res\\Capsule\\capsule.obj"); m_pF15K->addChild(m_pF15KModel);
+	//m_pF15KModel->setName("F-15K");
+	////osg::Matrix scale = osg::Matrix::scale(0.005, 0.005, 0.005);
+	////m_pF15K->setMatrix(scale);
 
 
-	auto rotation = osg::Matrix::rotate(45 * osg::PI/180, osg::Vec3(0, 0, 1));
+	//auto rotation = osg::Matrix::rotate(45 * osg::PI/180, osg::Vec3(0, 0, 1));
 
-	auto group = m_pF15KModel->asGroup();
-	for(int i = 0; i < group->getNumChildren(); i++)
-	{
-		auto geode = group->getChild(i)->asGeode();
-		if(nullptr != geode) {
-			for(int j = 0; j < geode->getNumChildren(); j++) {
-				auto geometry = geode->getChild(j)->asGeometry();
-				if(nullptr != geometry) {
-					osg::StateSet* ss = geometry->getOrCreateStateSet();				
-					ss->setMode(GL_LIGHTING,osg::StateAttribute::ON);
+	//auto group = m_pF15KModel->asGroup();
+	//for(int i = 0; i < group->getNumChildren(); i++)
+	//{
+	//	auto geode = group->getChild(i)->asGeode();
+	//	if(nullptr != geode) {
+	//		for(int j = 0; j < geode->getNumChildren(); j++) {
+	//			auto geometry = geode->getChild(j)->asGeometry();
+	//			if(nullptr != geometry) {
+	//				osg::StateSet* ss = geometry->getOrCreateStateSet();				
+	//				ss->setMode(GL_LIGHTING,osg::StateAttribute::ON);
 
-					osg::ref_ptr<osg::Material> material = new osg::Material;
-					material->setDiffuse (osg::Material::FRONT_AND_BACK, osg::Vec4(1.0, 1.0, 1.0, 1.0));
-					material->setAmbient(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
-					material->setSpecular(osg::Material::FRONT, osg::Vec4(0.15, 0.15, 0.15, 1.0));
-					material->setEmission(osg::Material::FRONT, osg::Vec4(0.4, 0.4, 0.4, 1.0));
-					/*
-					pMat->setDiffuse (osg::Material::FRONT_AND_BACK, osg::Vec4(1.0, 1.0, 1.0, 1.0));
-					pMat->setAmbient(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
-					pMat->setSpecular(osg::Material::FRONT, osg::Vec4(0.15, 0.15, 0.15, 1.0));
-					*/
-					ss->setAttributeAndModes(material, osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE);		
+	//				osg::ref_ptr<osg::Material> material = new osg::Material;
+	//				material->setDiffuse (osg::Material::FRONT_AND_BACK, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	//				material->setAmbient(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	//				material->setSpecular(osg::Material::FRONT, osg::Vec4(0.15, 0.15, 0.15, 1.0));
+	//				material->setEmission(osg::Material::FRONT, osg::Vec4(0.4, 0.4, 0.4, 1.0));
+	//				/*
+	//				pMat->setDiffuse (osg::Material::FRONT_AND_BACK, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	//				pMat->setAmbient(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	//				pMat->setSpecular(osg::Material::FRONT, osg::Vec4(0.15, 0.15, 0.15, 1.0));
+	//				*/
+	//				ss->setAttributeAndModes(material, osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE);		
 
-					osg::ref_ptr<osg::Texture2D> texture = (osg::Texture2D*) ss->getTextureAttribute(0, osg::StateAttribute::TEXTURE); 
-					if(texture)
-					{
-						texture->setInternalFormatMode(osg::Texture2D::USE_S3TC_DXT1_COMPRESSION);
-						texture->setUnRefImageDataAfterApply(true);
-						
-						auto filename = texture->getImage()->getFileName();
-						//_splitpath(filename.c_str(), )
+	//				osg::ref_ptr<osg::Texture2D> texture = (osg::Texture2D*) ss->getTextureAttribute(0, osg::StateAttribute::TEXTURE); 
+	//				if(texture)
+	//				{
+	//					texture->setInternalFormatMode(osg::Texture2D::USE_S3TC_DXT1_COMPRESSION);
+	//					texture->setUnRefImageDataAfterApply(true);
+	//					
+	//					auto filename = texture->getImage()->getFileName();
+	//					//_splitpath(filename.c_str(), )
 
-						osgDB::writeImageFile(*texture->getImage(), "D:\\result.bmp");
-					}
+	//					osgDB::writeImageFile(*texture->getImage(), "D:\\result.bmp");
+	//				}
 
-					osg::Vec3Array* va = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
-					if(nullptr != va) {
-						auto vi = va->begin();
-						auto ve = va->end();
-						for(; vi != ve; vi++) {
-							(*vi) = (*vi) * rotation;
-						}
-					}
+	//				osg::Vec3Array* va = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
+	//				if(nullptr != va) {
+	//					auto vi = va->begin();
+	//					auto ve = va->end();
+	//					for(; vi != ve; vi++) {
+	//						(*vi) = (*vi) * rotation;
+	//					}
+	//				}
 
-					osg::Vec3Array* na = dynamic_cast<osg::Vec3Array*>(geometry->getNormalArray());
-					if(nullptr != na) {
-						auto ni = na->begin();
-						auto ne = na->end();
-						for(; ni != ne; ni++) {
-							(*ni) = (*ni) * rotation;
-						}
-					}
-				}
-			}
-		}
-	}
+	//				osg::Vec3Array* na = dynamic_cast<osg::Vec3Array*>(geometry->getNormalArray());
+	//				if(nullptr != na) {
+	//					auto ni = na->begin();
+	//					auto ne = na->end();
+	//					for(; ni != ne; ni++) {
+	//						(*ni) = (*ni) * rotation;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
-	if(!osgDB::writeNodeFile(*m_pF15KModel, "D:\\result.obj")) {
-		MessageBox(nullptr, L"Error", L"Error", MB_OK);
-	}
+	//if(!osgDB::writeNodeFile(*m_pF15KModel, "D:\\result.obj")) {
+	//	MessageBox(nullptr, L"Error", L"Error", MB_OK);
+	//}
 
-	m_pAxisIndicator = new osg::MatrixTransform();
-	m_pCameraSub->addChild(m_pAxisIndicator.get());
+	//m_pAxisIndicator = new osg::MatrixTransform();
+	//m_pCameraSub->addChild(m_pAxisIndicator.get());
 
-	osg::ref_ptr<osg::Node> axisIndicatorX = this->LoadModel("..\\..\\res\\Axes\\AxisXPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorX);
-	osg::ref_ptr<osg::Node> axisIndicatorY = this->LoadModel("..\\..\\res\\Axes\\AxisYPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorY);
-	osg::ref_ptr<osg::Node> axisIndicatorZ = this->LoadModel("..\\..\\res\\Axes\\AxisZPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorZ);
-
-
-	m_pObjectMaipulator = new osg::MatrixTransform();
-	m_pRoot->addChild(m_pObjectMaipulator.get());
-	osg::Matrix mTemp;
-	mTemp = osg::Matrix::translate(50, -50, 50);
-	m_pObjectMaipulator->setMatrix(mTemp);
+	//osg::ref_ptr<osg::Node> axisIndicatorX = this->LoadModel("..\\..\\res\\Axes\\AxisXPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorX);
+	//osg::ref_ptr<osg::Node> axisIndicatorY = this->LoadModel("..\\..\\res\\Axes\\AxisYPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorY);
+	//osg::ref_ptr<osg::Node> axisIndicatorZ = this->LoadModel("..\\..\\res\\Axes\\AxisZPositive.OBJ"); m_pAxisIndicator->addChild(axisIndicatorZ);
 
 
-
-
-	m_pAxes = new osg::MatrixTransform();
-	m_pObjectMaipulator->addChild(m_pAxes.get());
-
-	osg::ref_ptr<osg::Node> axisXPositive = this->LoadModel("..\\..\\res\\Axes\\AxisXPositive.OBJ"); m_pAxes->addChild(axisXPositive);
-	osg::ref_ptr<osg::Node> axisXNegative = this->LoadModel("..\\..\\res\\Axes\\AxisXNegative.OBJ"); m_pAxes->addChild(axisXNegative);
-	osg::ref_ptr<osg::Node> axisYPositive = this->LoadModel("..\\..\\res\\Axes\\AxisYPositive.OBJ"); m_pAxes->addChild(axisYPositive);
-	osg::ref_ptr<osg::Node> axisYNegative = this->LoadModel("..\\..\\res\\Axes\\AxisYNegative.OBJ"); m_pAxes->addChild(axisYNegative);
-	osg::ref_ptr<osg::Node> axisZPositive = this->LoadModel("..\\..\\res\\Axes\\AxisZPositive.OBJ"); m_pAxes->addChild(axisZPositive);
-	osg::ref_ptr<osg::Node> axisZNegative = this->LoadModel("..\\..\\res\\Axes\\AxisZNegative.OBJ"); m_pAxes->addChild(axisZNegative);
+	//m_pObjectMaipulator = new osg::MatrixTransform();
+	//m_pRoot->addChild(m_pObjectMaipulator.get());
+	//osg::Matrix mTemp;
+	//mTemp = osg::Matrix::translate(50, -50, 50);
+	//m_pObjectMaipulator->setMatrix(mTemp);
 
 
 
 
-	m_pAxisHandles = new osg::MatrixTransform();
-	m_pObjectMaipulator->addChild(m_pAxisHandles.get());
+	//m_pAxes = new osg::MatrixTransform();
+	//m_pObjectMaipulator->addChild(m_pAxes.get());
 
-	osg::ref_ptr<osg::Node> axisHandleX = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleX.OBJ"); m_pAxisHandles->addChild(axisHandleX);
-	osg::ref_ptr<osg::Node> axisHandleY = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleY.OBJ"); m_pAxisHandles->addChild(axisHandleY);
-	osg::ref_ptr<osg::Node> axisHandleZ = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleZ.OBJ"); m_pAxisHandles->addChild(axisHandleZ);
+	//osg::ref_ptr<osg::Node> axisXPositive = this->LoadModel("..\\..\\res\\Axes\\AxisXPositive.OBJ"); m_pAxes->addChild(axisXPositive);
+	//osg::ref_ptr<osg::Node> axisXNegative = this->LoadModel("..\\..\\res\\Axes\\AxisXNegative.OBJ"); m_pAxes->addChild(axisXNegative);
+	//osg::ref_ptr<osg::Node> axisYPositive = this->LoadModel("..\\..\\res\\Axes\\AxisYPositive.OBJ"); m_pAxes->addChild(axisYPositive);
+	//osg::ref_ptr<osg::Node> axisYNegative = this->LoadModel("..\\..\\res\\Axes\\AxisYNegative.OBJ"); m_pAxes->addChild(axisYNegative);
+	//osg::ref_ptr<osg::Node> axisZPositive = this->LoadModel("..\\..\\res\\Axes\\AxisZPositive.OBJ"); m_pAxes->addChild(axisZPositive);
+	//osg::ref_ptr<osg::Node> axisZNegative = this->LoadModel("..\\..\\res\\Axes\\AxisZNegative.OBJ"); m_pAxes->addChild(axisZNegative);
+
+
+
+
+	//m_pAxisHandles = new osg::MatrixTransform();
+	//m_pObjectMaipulator->addChild(m_pAxisHandles.get());
+
+	//osg::ref_ptr<osg::Node> axisHandleX = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleX.OBJ"); m_pAxisHandles->addChild(axisHandleX);
+	//osg::ref_ptr<osg::Node> axisHandleY = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleY.OBJ"); m_pAxisHandles->addChild(axisHandleY);
+	//osg::ref_ptr<osg::Node> axisHandleZ = this->LoadModel("..\\..\\res\\AxisHandles\\AxisHandleZ.OBJ"); m_pAxisHandles->addChild(axisHandleZ);
 
 
 

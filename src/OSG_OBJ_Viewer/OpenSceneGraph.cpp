@@ -118,7 +118,8 @@ void OpenSceneGraph::InitModels()
 
 	std::string err;
 	bool ret =
-		tinyobj::LoadObj(&attrib, &shapes, &materials, &err, "E:\\Resources\\OBJ\\OOOO R8\\R8.obj", base_dir.c_str());
+		//tinyobj::LoadObj(&attrib, &shapes, &materials, &err, "E:\\Resources\\OBJ\\OOOO R8\\R8.obj", base_dir.c_str());
+		tinyobj::LoadObj(&attrib, &shapes, &materials, &err, "E:\\Resources\\OBJ\\F-15K\\F-15K.obj", base_dir.c_str());
 	if (!err.empty()) {
 		std::cerr << err << std::endl;
 	}
@@ -134,6 +135,43 @@ void OpenSceneGraph::InitModels()
 
 
 
+
+
+	osg::Geode *geode = new osg::Geode;
+	osg::Geometry *g = new osg::Geometry;
+	
+	osg::ref_ptr<osg::Vec3Array> v = new osg::Vec3Array;
+	int size = attrib.vertices.size();
+	for(int i = 0; i < size; i += 3) {
+		v->push_back(osg::Vec3(attrib.vertices[i], attrib.vertices[i + 1], attrib.vertices[i + 2]));
+	}
+	g->setVertexArray(v);
+
+	osg::ref_ptr<osg::Vec3Array> n = new osg::Vec3Array;
+	size = attrib.normals.size();
+	for(int i = 0; i < size; i += 3) {
+		n->push_back(osg::Vec3(attrib.normals[i], attrib.normals[i + 1], attrib.normals[i + 2]));
+	}
+	g->setNormalArray(v);
+
+	osg::ref_ptr<osg::Vec2Array> t = new osg::Vec2Array;
+	size = attrib.texcoords.size();
+	for(int i = 0; i < size; i += 2) {
+		t->push_back(osg::Vec2(attrib.texcoords[i], attrib.texcoords[i + 1]));
+	}
+	g->setTexCoordArray(0, t);
+
+
+	
+	osg::DrawArrays *da = new 
+		osg::DrawArrays(osg::PrimitiveSet::TRIANGLES, 0, v->size());
+
+	g->addPrimitiveSet(da);
+
+	geode->addDrawable(g);
+	geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+	m_pRoot->addChild(geode);
 
 
 

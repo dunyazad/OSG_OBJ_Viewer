@@ -2,17 +2,17 @@
 
 #include "OSG_Common.h"
 
-class OpenSceneGraph;
+class OSG_App;
 
 class CRenderingThread : public OpenThreads::Thread
 {
 public:
-	CRenderingThread( OpenSceneGraph* ptr );
+	CRenderingThread(OSG_App* ptr);
 	virtual ~CRenderingThread();
 
 	virtual void run();
 
 protected:
-	OpenSceneGraph* _ptr;
+	OSG_App* _ptr;
 	bool _done;
 };

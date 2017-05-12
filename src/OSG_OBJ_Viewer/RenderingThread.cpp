@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "OpenSceneGraph.h"
+#include "OSG_App.h"
 #include "RenderingThread.h"
 
-CRenderingThread::CRenderingThread( OpenSceneGraph* ptr )
+CRenderingThread::CRenderingThread(OSG_App* ptr)
 	:   OpenThreads::Thread(), _ptr(ptr), _done(false)
 {
 }

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "OpenSceneGraph.h"
+#include "OSG_App.h"
 
 
 // OpenSceneGraph_OBJ_ViewerDlg dialog
@@ -23,7 +23,7 @@ public:
 
 // Implementation
 protected:
-	OpenSceneGraph* m_pOSG;
+	OSG_App* m_pOSG;
 	CRenderingThread* mThreadHandle;
 
 	HICON m_hIcon;

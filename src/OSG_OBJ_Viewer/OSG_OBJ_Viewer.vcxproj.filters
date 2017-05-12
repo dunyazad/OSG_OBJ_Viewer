@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="DIORCO">
+      <UniqueIdentifier>{27753c8f-8d47-4e7a-95e9-8e7d2e0027c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DIORCO\Util">
+      <UniqueIdentifier>{c1da1949-e9c6-4872-8c8a-043611de1dc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -39,9 +45,6 @@
     <ClInclude Include="Resource.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="OpenSceneGraph.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="RenderingThread.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -51,7 +54,28 @@
     <ClInclude Include="CameraController.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="tiny_obj_loader.h">
+    <ClInclude Include="DIORCO\CustomOBJLoader.h">
+      <Filter>DIORCO</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\DIORCO_Common.h">
+      <Filter>DIORCO</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\tiny_obj_loader.h">
+      <Filter>DIORCO</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\Util\DebugConsoleWindow.h">
+      <Filter>DIORCO\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\Util\TimeWatch.h">
+      <Filter>DIORCO\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\Util\Util.h">
+      <Filter>DIORCO\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="OSG_App.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="RTT.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,16 +89,31 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="OpenSceneGraph.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="RenderingThread.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CameraController.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="tiny_obj_loader.cc">
+    <ClCompile Include="DIORCO\CustomOBJLoader.cpp">
+      <Filter>DIORCO</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\DIORCO_Common.cpp">
+      <Filter>DIORCO</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\tiny_obj_loader.cc">
+      <Filter>DIORCO</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\Util\DebugConsoleWindow.cpp">
+      <Filter>DIORCO\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\Util\TimeWatch.cpp">
+      <Filter>DIORCO\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="OSG_App.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RTT.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

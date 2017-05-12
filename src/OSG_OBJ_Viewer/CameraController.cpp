@@ -64,13 +64,13 @@ void CameraController::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CameraController::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	osg::ref_ptr<osgUtil::RayIntersector> picker = new osgUtil::RayIntersector(osgUtil::Intersector::WINDOW, point.x, point.y); 
-	osgUtil::IntersectionVisitor iv(picker.get()); 
-	m_pCamera->accept(iv); 
-	if (picker->containsIntersections()) 
-	{
-		AfxMessageBox(L"Pick");
-	}
+	//osg::ref_ptr<osgUtil::RayIntersector> picker = new osgUtil::RayIntersector(osgUtil::Intersector::WINDOW, point.x, point.y); 
+	//osgUtil::IntersectionVisitor iv(picker.get()); 
+	//m_pCamera->accept(iv); 
+	//if (picker->containsIntersections()) 
+	//{
+	//	AfxMessageBox(L"Pick");
+	//}
 
 	m_lButtonDown = false;
 	this->ApplyChange();

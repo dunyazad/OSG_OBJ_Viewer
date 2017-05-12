@@ -112,7 +112,7 @@ BOOL OpenSceneGraph_OBJ_ViewerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-	m_pOSG = new OpenSceneGraph(m_hWnd);
+	m_pOSG = new OSG_App(m_hWnd);
 	m_pOSG->Initialize();
 
 	mThreadHandle = new CRenderingThread(m_pOSG);

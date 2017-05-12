@@ -2,6 +2,13 @@
 
 #include "OSG_Common.h"
 
+struct CameraInfo {
+	osg::ref_ptr<osg::Camera> pCamera;
+	osg::Vec3d target;
+	osg::Vec3d position;
+	osg::Vec3d up;
+};
+
 class CameraController
 {
 public:
@@ -20,10 +27,12 @@ public:
 	void OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
 private:
-	osg::ref_ptr<osg::Camera> m_pCamera;
+	std::map<std::string, osg::ref_ptr<osg::Camera>> m_cameraInfoMap;
+	osg::ref_ptr<osg::Camera> m_pMainCamera;
 	osg::Vec3d m_target;
 	osg::Vec3d m_position;
 	osg::Vec3d m_up;
+
 	double m_angleH;
 	double m_angleV;
 	double m_distance;

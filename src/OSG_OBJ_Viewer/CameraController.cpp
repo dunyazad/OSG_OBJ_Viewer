@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "CameraController.h"
 
-CameraController::CameraController(osgViewer::Viewer* pViewer, osg::Group* pRoot, osg::ref_ptr<osg::Camera> pCamera) : m_pViewer(pViewer), m_pRoot(pRoot), m_pCamera(pCamera)
+CameraController::CameraController(osgViewer::Viewer* pViewer, osg::Group* pRoot, osg::ref_ptr<osg::Camera> pCamera) : m_pViewer(pViewer), m_pRoot(pRoot), m_pMainCamera(pCamera)
 {
 	m_target = osg::Vec3(0, 0, 0);
 	m_up = osg::Vec3(0, 0, 1);

@@ -28,6 +28,7 @@
 #include <osg/Material>
 #include <osg/AutoTransform>
 #include <osg/Notify>
+#include <osg/BlendFunc>
 
 #include <osg/io_utils>
 

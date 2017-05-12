@@ -30,17 +30,18 @@ void OSG_App::Initialize()
  
 void OSG_App::InitModels()
 {
+	m_pMainObject = new osg::MatrixTransform;
+	m_pRoot->addChild(m_pMainObject.get());
 
 #define ___CUSTOM_LOADER___
 #ifdef ___CUSTOM_LOADER___
-	auto group = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
+	m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
 	//auto group = LoadObjFile("..\\..\\res\\Init\\Init.obj", "..\\..\\res\\Init");
-	m_pRoot->addChild(group);
-#else
-	m_pMainObject = new osg::MatrixTransform;
 	m_pRoot->addChild(m_pMainObject.get());
-	osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.obj"); m_pMainObject->addChild(m_pTargetObjectModel);
-	//osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\Init\\Init.obj"); m_pMainObject->addChild(m_pTargetObjectModel);
+#else
+	osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.obj");
+	//osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\Init\\Init.obj");
+	m_pMainObject->addChild(m_pTargetObjectModel);
 	osg::Matrix scale = osg::Matrix::scale(0.5, 0.5, 0.5);
 	m_pMainObject->setMatrix(scale);
 #endif
@@ -141,6 +142,8 @@ void OSG_App::InitCameraConfig()
 	m_pCameraMain->setViewport(new osg::Viewport(traits->x, traits->y, traits->width, traits->height));
  
 	// Set projection matrix and camera attribtues
+	m_pCameraMain->setReferenceFrame(osg::Camera::ABSOLUTE_RF);
+	m_pCameraMain->setRenderOrder(osg::Camera::POST_RENDER);
 	m_pCameraMain->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	m_pCameraMain->setClearColor(osg::Vec4f(0.3f, 0.5f, 0.7f, 1.0f));
 	m_pCameraMain->setProjectionMatrixAsPerspective(
@@ -148,19 +151,41 @@ void OSG_App::InitCameraConfig()
  
 	m_pCameraController = new CameraController(mViewer, m_pRoot, m_pCameraMain);
  
-	//m_pCameraSub = new osg::Camera();
-	//m_pCameraSub->setViewport(new osg::Viewport(traits->x, traits->y, traits->width, traits->height));
- //
-	//// Set projection matrix and camera attribtues
-	//m_pCameraSub->setClearMask(GL_DEPTH_BUFFER_BIT);
-	//m_pCameraSub->setRenderOrder(osg::Camera::POST_RENDER, 0);
-	//m_pCameraSub->setClearColor(osg::Vec4f(0.3f, 0.5f, 0.7f, 1.0f));
-	//m_pCameraSub->setProjectionMatrixAsPerspective(
-	//	30.0f, static_cast<double>(traits->width)/static_cast<double>(traits->height), 1.0, 1000.0);
- 
+	{
+		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
+		auto t = osg::Matrix::translate(-20, 0, 0);
+		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
+		pRTT->SetImageTransform(r * t);
+		pRTT->SetCameraPosition(-20, 0, 0);
+		m_pRTTs.push_back(pRTT);
+	}
+	{
+		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
+		auto t = osg::Matrix::translate(20, 0, 0);
+		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
+		pRTT->SetImageTransform(r * t);
+		pRTT->SetCameraPosition(20, 0, 0);
+		m_pRTTs.push_back(pRTT);
+	}
+	{
+		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
+		auto t = osg::Matrix::translate(0, 0, 20);
+		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
+		pRTT->SetImageTransform(r * t);
+		pRTT->SetCameraPosition(0, 0, 20);
+		m_pRTTs.push_back(pRTT);
+	}
+	{
+		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
+		auto t = osg::Matrix::translate(0, 0, -20);
+		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
+		pRTT->SetImageTransform(r * t);
+		pRTT->SetCameraPosition(0, 0, -20);
+		m_pRTTs.push_back(pRTT);
+	}
+
 	// Add the Camera to the Viewer
 	mViewer->setCamera(m_pCameraMain.get());
-//	mViewer->addSlave(m_pCameraSub);
  
 	// Set the Scene Data
 	mViewer->setSceneData(m_pRoot.get());
@@ -282,7 +307,7 @@ void OSG_App::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	m_pCameraController->OnMouseWheel(nFlags, zDelta, pt);
 }
  
-osg::ref_ptr<osg::Group> OSG_App::LoadObjFile(const std::string& objFileName, const std::string& baseDir, bool flipYZ, float scale)
+osg::ref_ptr<osg::MatrixTransform> OSG_App::LoadObjFile(const std::string& objFileName, const std::string& baseDir, bool flipYZ, float scale)
 {
 	std::string baseDirectory = baseDir;
 	if(baseDirectory[baseDirectory.size() - 1] != '\\' || baseDirectory[baseDirectory.size() - 1] != '/') {
@@ -367,7 +392,7 @@ osg::ref_ptr<osg::Group> OSG_App::LoadObjFile(const std::string& objFileName, co
 		}
 	}
 
-	osg::ref_ptr<osg::Group> group = new osg::Group();
+	osg::ref_ptr<osg::MatrixTransform> matrixTransform = new osg::MatrixTransform();
 
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++) {
@@ -410,7 +435,7 @@ osg::ref_ptr<osg::Group> OSG_App::LoadObjFile(const std::string& objFileName, co
 
 	for (unsigned int materialIndex = 0; materialIndex < materials.size(); materialIndex++) {
 		osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-		group->addChild(geode);
+		matrixTransform->addChild(geode);
 		auto ss = geode->getOrCreateStateSet();
 		ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
@@ -521,5 +546,5 @@ osg::ref_ptr<osg::Group> OSG_App::LoadObjFile(const std::string& objFileName, co
 
 
  
-	return group;
+	return matrixTransform;
 }

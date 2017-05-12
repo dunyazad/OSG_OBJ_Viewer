@@ -5,6 +5,7 @@
 #include <DIORCO/Util/Util.h>
 #include "RenderingThread.h"
 #include "CameraController.h"
+#include "RTT.h"
 
 class OSG_App
 {
@@ -42,7 +43,7 @@ public:
 	void OnMouseMove(UINT nFlags, CPoint point);
 	void OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
-	osg::ref_ptr<osg::Group> LoadObjFile(const std::string& objFileName, const std::string& baseDir, bool flipYZ = false, float scale = 1);
+	osg::ref_ptr<osg::MatrixTransform> LoadObjFile(const std::string& objFileName, const std::string& baseDir, bool flipYZ = false, float scale = 1);
 
 private:
 	bool mDone;
@@ -63,4 +64,6 @@ private:
 	osg::ref_ptr<osg::Camera> m_pCameraLeft;
 	osg::ref_ptr<osg::Camera> m_pCameraTop;
 	osg::ref_ptr<osg::Camera> m_pCameraFront;
+
+	std::vector<RTT*> m_pRTTs;
 };

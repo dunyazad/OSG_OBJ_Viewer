@@ -9,7 +9,9 @@ public:
 
 	inline osg::ref_ptr<osg::Camera> GetCamera() { return m_pCamera.get(); }
 
+	const osg::Vec3& GetCameraPosition() const;
 	void SetCameraPosition(float x, float y, float z);
+	const osg::Vec3& GetCameraTarget() const;
 	void SetCameraTarget(float x, float y, float z);
 
 	void SetImageTransform(osg::Matrix transform);
@@ -18,7 +20,6 @@ private:
 	float m_width;
 	float m_height;
 	osg::ref_ptr<osg::Camera> m_pCamera;
-	osg::ref_ptr<osg::Image> m_pImage;
 	osg::ref_ptr<osg::Texture2D> m_pTexture;
 	osg::ref_ptr<osg::MatrixTransform> m_pMatrixTransform;
 	osg::ref_ptr<osg::Geode> m_pGeode;

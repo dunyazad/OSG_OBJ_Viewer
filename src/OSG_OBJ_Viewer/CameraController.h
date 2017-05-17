@@ -2,11 +2,10 @@
 
 #include "OSG_Common.h"
 
-struct CameraInfo {
-	osg::ref_ptr<osg::Camera> pCamera;
-	osg::Vec3d target;
-	osg::Vec3d position;
-	osg::Vec3d up;
+class RTT;
+
+struct RTTInfo {
+	RTT* pRTT;
 };
 
 class CameraController
@@ -26,8 +25,10 @@ public:
 	void OnMouseMove(UINT nFlags, CPoint point);
 	void OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
+	void AddRTT(std::string& name, RTT* pRTT);
+
 private:
-	std::map<std::string, osg::ref_ptr<osg::Camera>> m_cameraInfoMap;
+	std::map<std::string, RTT*> m_RTTInfooMap;
 	osg::ref_ptr<osg::Camera> m_pMainCamera;
 	osg::Vec3d m_target;
 	osg::Vec3d m_position;

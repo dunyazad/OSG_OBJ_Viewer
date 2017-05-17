@@ -35,8 +35,8 @@ void OSG_App::InitModels()
 
 #define ___CUSTOM_LOADER___
 #ifdef ___CUSTOM_LOADER___
-	m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
-	//auto group = LoadObjFile("..\\..\\res\\Init\\Init.obj", "..\\..\\res\\Init");
+	//m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
+	m_pMainObject = LoadObjFile("..\\..\\res\\Init\\Init.obj", "..\\..\\res\\Init", true, 0.1f);
 	m_pRoot->addChild(m_pMainObject.get());
 #else
 	osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.obj");
@@ -158,6 +158,7 @@ void OSG_App::InitCameraConfig()
 		pRTT->SetImageTransform(r * t);
 		pRTT->SetCameraPosition(-20, 0, 0);
 		m_pRTTs.push_back(pRTT);
+		m_pCameraController->AddRTT(std::string("1"), pRTT);
 	}
 	{
 		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
@@ -166,6 +167,7 @@ void OSG_App::InitCameraConfig()
 		pRTT->SetImageTransform(r * t);
 		pRTT->SetCameraPosition(20, 0, 0);
 		m_pRTTs.push_back(pRTT);
+		m_pCameraController->AddRTT(std::string("2"), pRTT);
 	}
 	{
 		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
@@ -174,6 +176,7 @@ void OSG_App::InitCameraConfig()
 		pRTT->SetImageTransform(r * t);
 		pRTT->SetCameraPosition(0, 0, 20);
 		m_pRTTs.push_back(pRTT);
+		m_pCameraController->AddRTT(std::string("3"), pRTT);
 	}
 	{
 		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
@@ -182,6 +185,7 @@ void OSG_App::InitCameraConfig()
 		pRTT->SetImageTransform(r * t);
 		pRTT->SetCameraPosition(0, 0, -20);
 		m_pRTTs.push_back(pRTT);
+		m_pCameraController->AddRTT(std::string("4"), pRTT);
 	}
 
 	// Add the Camera to the Viewer
@@ -548,3 +552,4 @@ osg::ref_ptr<osg::MatrixTransform> OSG_App::LoadObjFile(const std::string& objFi
  
 	return matrixTransform;
 }
+

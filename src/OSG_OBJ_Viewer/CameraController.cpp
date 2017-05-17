@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "CameraController.h"
+#include "RTT.h"
 
 CameraController::CameraController(osgViewer::Viewer* pViewer, osg::Group* pRoot, osg::ref_ptr<osg::Camera> pCamera) : m_pViewer(pViewer), m_pRoot(pRoot), m_pMainCamera(pCamera)
 {
@@ -39,9 +40,23 @@ void CameraController::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	osg::Vec3 right = dir ^ m_up;
 
 	if(nChar == 'A' || nChar == 'a') {
-		m_target -= right;
+		//m_target -= right;
+
+		auto kvp = m_RTTInfooMap.begin();
+		auto end = m_RTTInfooMap.end();
+		for(; kvp != end; kvp++) {
+			auto position = (*kvp).second->GetCameraPosition() - right * 2;
+			(*kvp).second->SetCameraPosition(position.x(), position.y(), position.z());
+		}
 	} else if(nChar == 'D' || nChar == 'd') {
-		m_target += right;
+		//m_target += right;
+
+		auto kvp = m_RTTInfooMap.begin();
+		auto end = m_RTTInfooMap.end();
+		for(; kvp != end; kvp++) {
+			auto position = (*kvp).second->GetCameraPosition() + right * 2;
+			(*kvp).second->SetCameraPosition(position.x(), position.y(), position.z());
+		}
 	} else if(nChar == 'W' || nChar == 'w') {
 		m_target += dir;
 	} else if(nChar == 'S' || nChar == 's') {
@@ -141,6 +156,11 @@ void CameraController::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	this->ApplyChange();
 }
 
+void CameraController::AddRTT(std::string& name, RTT* pRTT)
+{
+	m_RTTInfooMap[name] = pRTT;
+}
+
 void CameraController::ApplyChange()
 {
 	osg::Matrix mH = osg::Matrix::rotate(osg::DegreesToRadians(m_angleH), osg::Vec3(0, 0, 1));
@@ -149,7 +169,7 @@ void CameraController::ApplyChange()
 
 	m_up.normalize();
 
-	m_pCamera->setViewMatrixAsLookAt( m_position, m_target, m_up );
+	m_pMainCamera->setViewMatrixAsLookAt( m_position, m_target, m_up );
 
 	//m_pCubePAT->setPosition(m_target);
 }

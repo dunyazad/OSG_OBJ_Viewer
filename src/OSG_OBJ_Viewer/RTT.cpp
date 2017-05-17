@@ -2,6 +2,81 @@
 
 #include "RTT.h"
 
+
+
+struct MyCameraPostDrawCallback : public osg::Camera::DrawCallback
+{
+    MyCameraPostDrawCallback(osg::Image* image):
+        _image(image)
+    {
+    }
+
+    virtual void operator () (const osg::Camera& /*camera*/) const
+    {
+        //if (_image && _image->getPixelFormat()==GL_RGBA && _image->getDataType()==GL_UNSIGNED_BYTE)
+        //{
+        //    // we'll pick out the center 1/2 of the whole image,
+        //    int column_start = _image->s()/4;
+        //    int column_end = 3*column_start;
+
+        //    int row_start = _image->t()/4;
+        //    int row_end = 3*row_start;
+
+
+        //    // and then invert these pixels
+        //    for(int r=row_start; r<row_end; ++r)
+        //    {
+        //        unsigned char* data = _image->data(column_start, r);
+        //        for(int c=column_start; c<column_end; ++c)
+        //        {
+        //            (*data) = 255-(*data); ++data;
+        //            (*data) = 255-(*data); ++data;
+        //            (*data) = 255-(*data); ++data;
+        //            (*data) = 255; ++data;
+        //        }
+        //    }
+
+
+        //    // dirty the image (increments the modified count) so that any textures
+        //    // using the image can be informed that they need to update.
+        //    _image->dirty();
+        //}
+        //else if (_image && _image->getPixelFormat()==GL_RGBA && _image->getDataType()==GL_FLOAT)
+        //{
+        //    // we'll pick out the center 1/2 of the whole image,
+        //    int column_start = _image->s()/4;
+        //    int column_end = 3*column_start;
+
+        //    int row_start = _image->t()/4;
+        //    int row_end = 3*row_start;
+
+        //    // and then invert these pixels
+        //    for(int r=row_start; r<row_end; ++r)
+        //    {
+        //        float* data = (float*)_image->data(column_start, r);
+        //        for(int c=column_start; c<column_end; ++c)
+        //        {
+        //            (*data) = 1.0f-(*data); ++data;
+        //            (*data) = 1.0f-(*data); ++data;
+        //            (*data) = 1.0f-(*data); ++data;
+        //            (*data) = 1.0f; ++data;
+        //        }
+        //    }
+
+        //    // dirty the image (increments the modified count) so that any textures
+        //    // using the image can be informed that they need to update.
+        //    _image->dirty();
+        //}
+
+		//_image->dirty();
+    }
+
+    osg::Image* _image;
+};
+
+
+
+
 RTT::RTT(float width, float height, osgViewer::Viewer* pViewer, osg::ref_ptr<osg::Group> root, osg::ref_ptr<osg::Camera> mainCamera)
 	: m_width(width), m_height(height), m_pViewer(pViewer), m_eye(10, 0, 0), m_target(0, 0, 0)
 {
@@ -23,14 +98,13 @@ RTT::RTT(float width, float height, osgViewer::Viewer* pViewer, osg::ref_ptr<osg
 	m_pCamera->setViewMatrixAsLookAt(m_eye, m_target, osg::Vec3(0, 1, 0));
 
 
-	m_pImage = new osg::Image();
-	m_pImage->allocateImage(viewportWidth, viewportHeight, 1, GL_RGBA, GL_FLOAT);
-	m_pImage->setInternalTextureFormat(GL_RGBA32F_ARB);
-
 	m_pTexture = new osg::Texture2D();
-	m_pTexture->setImage(m_pImage.get());
+	m_pTexture->setTextureSize(viewportWidth, viewportHeight);
+	m_pTexture->setInternalFormat(GL_RGBA);
+	m_pTexture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
+	m_pTexture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
 	
-	m_pCamera->attach(osg::Camera::COLOR_BUFFER0, m_pTexture.get());
+	m_pCamera->attach(osg::Camera::COLOR_BUFFER, m_pTexture.get());
 
 	m_pMatrixTransform = new osg::MatrixTransform();
 
@@ -48,7 +122,7 @@ RTT::RTT(float width, float height, osgViewer::Viewer* pViewer, osg::ref_ptr<osg
 	m_pGeometry->setVertexArray(vertexArray);
 
 	osg::ref_ptr<osg::Vec4Array> colorArray = new osg::Vec4Array();
-	colorArray->push_back(osg::Vec4(1.f, 1.f, 1.f, 1.f));
+	colorArray->push_back(osg::Vec4(1.f, 1.f, 1.f, 1.0f));
 	m_pGeometry->setColorArray(colorArray);
 	m_pGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
@@ -77,10 +151,20 @@ RTT::~RTT()
 {
 }
 
+const osg::Vec3& RTT::GetCameraPosition() const
+{
+	return m_eye;
+}
+
 void RTT::SetCameraPosition(float x, float y, float z)
 {
 	m_eye = osg::Vec3(x, y, z);
 	m_pCamera->setViewMatrixAsLookAt(m_eye, m_target, osg::Vec3(0, 1, 0));
+}
+
+const osg::Vec3& RTT::GetCameraTarget() const
+{
+	return m_target;
 }
 
 void RTT::SetCameraTarget(float x, float y, float z)

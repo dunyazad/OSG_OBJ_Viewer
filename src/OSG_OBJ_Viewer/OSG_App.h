@@ -3,6 +3,7 @@
 #include "OSG_Common.h"
 #include <DIORCO/DIORCO_Common.h>
 #include <DIORCO/Util/Util.h>
+#include <DIORCO/View/View.h>
 #include "RenderingThread.h"
 #include "CameraController.h"
 #include "RTT.h"
@@ -50,6 +51,9 @@ private:
 	std::string m_ModelName;
 	HWND m_hWnd;
 	osgViewer::Viewer* mViewer;
+
+	DIORCO::RTTViewContainer* m_pViewContainer;
+
 	osg::ref_ptr<osg::Group> m_pRoot;
 	osg::ref_ptr<osg::MatrixTransform> m_pMainObject;
 	

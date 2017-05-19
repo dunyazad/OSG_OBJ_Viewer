@@ -118,6 +118,9 @@
     <ClInclude Include="DIORCO\Util\DebugConsoleWindow.h" />
     <ClInclude Include="DIORCO\Util\TimeWatch.h" />
     <ClInclude Include="DIORCO\Util\Util.h" />
+    <ClInclude Include="DIORCO\View\RTTView.h" />
+    <ClInclude Include="DIORCO\View\RTTViewContainer.h" />
+    <ClInclude Include="DIORCO\View\View.h" />
     <ClInclude Include="OSG_App.h" />
     <ClInclude Include="OSG_Common.h" />
     <ClInclude Include="OSG_OBJ_Viewer.h" />
@@ -135,6 +138,8 @@
     <ClCompile Include="DIORCO\tiny_obj_loader.cc" />
     <ClCompile Include="DIORCO\Util\DebugConsoleWindow.cpp" />
     <ClCompile Include="DIORCO\Util\TimeWatch.cpp" />
+    <ClCompile Include="DIORCO\View\RTTView.cpp" />
+    <ClCompile Include="DIORCO\View\RTTViewContainer.cpp" />
     <ClCompile Include="OSG_App.cpp" />
     <ClCompile Include="OSG_OBJ_Viewer.cpp" />
     <ClCompile Include="OSG_OBJ_ViewerDlg.cpp" />

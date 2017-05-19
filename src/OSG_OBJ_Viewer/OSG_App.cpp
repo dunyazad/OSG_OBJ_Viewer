@@ -15,6 +15,12 @@ OSG_App::~OSG_App()
 	Sleep(1000);
 	mViewer->stopThreading();
  
+	auto i = m_pRTTs.begin();
+	auto e = m_pRTTs.end();
+	for(;i != e; i++) {
+		if((*i)) delete(*i);
+	}
+
 	delete mViewer;
  
 	if(m_pCameraController) delete m_pCameraController;
@@ -35,8 +41,9 @@ void OSG_App::InitModels()
 
 #define ___CUSTOM_LOADER___
 #ifdef ___CUSTOM_LOADER___
-	//m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
-	m_pMainObject = LoadObjFile("..\\..\\res\\Init\\Init.obj", "..\\..\\res\\Init", true, 0.1f);
+	m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
+	//m_pMainObject = LoadObjFile("..\\..\\res\\Init\\Init.obj", "..\\..\\res\\Init", true, 0.1f);
+	m_pMainObject->setNodeMask(0x02);
 	m_pRoot->addChild(m_pMainObject.get());
 #else
 	osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.obj");
@@ -92,109 +99,58 @@ osg::ref_ptr<osg::PositionAttitudeTransform> OSG_App::CreateLight(int index, osg
  
 void OSG_App::InitCameraConfig()
 {
-	// Local Variable to hold window size data
-	RECT windowRect;
-	RECT clientRect;
- 
-	// Create the viewer for this window
 	mViewer = new osgViewer::Viewer();
  
 	// Add a Stats Handler to the viewer
 	//mViewer->addEventHandler(new osgViewer::StatsHandler);
  
-	// Get the current window size
-	::GetWindowRect(m_hWnd, &windowRect);
-	::GetClientRect(m_hWnd, &clientRect);
- 
-	// Init the GraphicsContext Traits
-	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
- 
-	// Init the Windata Variable that holds the handle for the Window to display OSG in.
-	osg::ref_ptr<osg::Referenced> windata = new osgViewer::GraphicsWindowWin32::WindowData(m_hWnd);
- 
-	// Setup the traits parameters
-	traits->x = clientRect.left;
-	traits->y = windowRect.bottom - clientRect.bottom;
-	traits->width = clientRect.right - clientRect.left;
-	traits->height = clientRect.bottom - clientRect.top;
- 
-	traits->windowDecoration = false;
-	traits->doubleBuffer = true;
-	traits->sharedContext = 0;
-	traits->setInheritedWindowPixelFormat = true;
-	traits->inheritedWindowData = windata;
- 
-	// Create the Graphics Context
-	osg::GraphicsContext* gc = osg::GraphicsContext::createGraphicsContext(traits.get());
- 
-	// Init Master Camera for this View
-	m_pCameraMain = mViewer->getCamera();
- 
-	// Assign Graphics Context to the Camera
-	m_pCameraMain->setGraphicsContext(gc);
- 
-	traits->x = 0;
-	traits->y = 0;
-	traits->width = clientRect.right - clientRect.left;
-	traits->height = clientRect.bottom - clientRect.top;
- 
-	// Set the viewport for the Camera
-	m_pCameraMain->setViewport(new osg::Viewport(traits->x, traits->y, traits->width, traits->height));
- 
-	// Set projection matrix and camera attribtues
-	m_pCameraMain->setReferenceFrame(osg::Camera::ABSOLUTE_RF);
-	m_pCameraMain->setRenderOrder(osg::Camera::POST_RENDER);
-	m_pCameraMain->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	m_pCameraMain->setClearColor(osg::Vec4f(0.3f, 0.5f, 0.7f, 1.0f));
-	m_pCameraMain->setProjectionMatrixAsPerspective(
-		30.0f, static_cast<double>(traits->width)/static_cast<double>(traits->height), 1.0, 1000.0);
- 
-	m_pCameraController = new CameraController(mViewer, m_pRoot, m_pCameraMain);
- 
+	m_pViewContainer = new DIORCO::RTTViewContainer(m_hWnd, mViewer);
+	m_pCameraController = new CameraController();
+
 	{
-		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
-		auto t = osg::Matrix::translate(-20, 0, 0);
-		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
-		pRTT->SetImageTransform(r * t);
-		pRTT->SetCameraPosition(-20, 0, 0);
-		m_pRTTs.push_back(pRTT);
-		m_pCameraController->AddRTT(std::string("1"), pRTT);
-	}
-	{
-		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
-		auto t = osg::Matrix::translate(20, 0, 0);
-		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
-		pRTT->SetImageTransform(r * t);
-		pRTT->SetCameraPosition(20, 0, 0);
-		m_pRTTs.push_back(pRTT);
-		m_pCameraController->AddRTT(std::string("2"), pRTT);
-	}
-	{
-		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
-		auto t = osg::Matrix::translate(0, 0, 20);
-		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
-		pRTT->SetImageTransform(r * t);
-		pRTT->SetCameraPosition(0, 0, 20);
-		m_pRTTs.push_back(pRTT);
-		m_pCameraController->AddRTT(std::string("3"), pRTT);
-	}
-	{
-		auto pRTT = new RTT(16, 16, mViewer, m_pRoot, m_pCameraMain);
-		auto t = osg::Matrix::translate(0, 0, -20);
-		auto r = osg::Matrix::rotate(osg::DegreesToRadians(90.0f), osg::Vec3(1, 0, 0));
-		pRTT->SetImageTransform(r * t);
-		pRTT->SetCameraPosition(0, 0, -20);
-		m_pRTTs.push_back(pRTT);
-		m_pCameraController->AddRTT(std::string("4"), pRTT);
+		auto pView = m_pViewContainer->CreateView("UpperLeft", m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 2);
+		m_pRoot->addChild(pView);
+		pView->SetImageTransform(osg::Matrix::translate(-m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 4, 0));
+		pView->GetCamera()->setClearColor(osg::Vec4f(1.0f, 0.7f, 0.7f, 1.0f));
+		m_pCameraController->RegisterView(pView);
 	}
 
-	// Add the Camera to the Viewer
-	mViewer->setCamera(m_pCameraMain.get());
+	{
+		auto pView = m_pViewContainer->CreateView("UpperCenter", m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 2);
+		m_pRoot->addChild(pView);
+		pView->SetImageTransform(osg::Matrix::translate(0, m_pViewContainer->GetHeight() / 4, 0));
+		pView->GetCamera()->setClearColor(osg::Vec4f(0.7f, 1.0f, 0.7f, 1.0f));
+		m_pCameraController->RegisterView(pView);
+	}
+
+	{
+		auto pView = m_pViewContainer->CreateView("UpperRight", m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 2);
+		m_pRoot->addChild(pView);
+		pView->SetImageTransform(osg::Matrix::translate(m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 4, 0));
+		pView->GetCamera()->setClearColor(osg::Vec4f(0.7f, 0.7f, 1.0f, 1.0f));
+		m_pCameraController->RegisterView(pView);
+	}
+
+	{
+		auto pView = m_pViewContainer->CreateView("LowerLeft", m_pViewContainer->GetWidth() / 2, m_pViewContainer->GetHeight() / 2);
+		m_pRoot->addChild(pView);
+		pView->SetImageTransform(osg::Matrix::translate(-m_pViewContainer->GetWidth() / 4, -m_pViewContainer->GetHeight() / 4, 0));
+		pView->GetCamera()->setClearColor(osg::Vec4f(0.3f, 0.3f, 0.3f, 1.0f));
+		m_pCameraController->RegisterView(pView);
+	}
+
+	{
+		auto pView = m_pViewContainer->CreateView("LowerRight", m_pViewContainer->GetWidth() / 2, m_pViewContainer->GetHeight() / 2);
+		m_pRoot->addChild(pView);
+		pView->SetImageTransform(osg::Matrix::translate(m_pViewContainer->GetWidth() / 4, -m_pViewContainer->GetHeight() / 4, 0));
+		pView->GetCamera()->setClearColor(osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+		m_pCameraController->RegisterView(pView);
+	}
+
+	mViewer->setCamera(m_pViewContainer->GetCameraMain().get());
  
-	// Set the Scene Data
 	mViewer->setSceneData(m_pRoot.get());
- 
-	// Realize the Viewer
+
 	mViewer->realize();
 }
  
@@ -263,6 +219,18 @@ osg::ref_ptr<osg::Node> OSG_App::LoadModel(std::string filename)
  
 void OSG_App::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
+	if(nChar == 0x30) {
+		m_pCameraController->SelectView(m_pViewContainer->GetView("UpperLeft"));
+	} else if(nChar == 0x31) {
+		m_pCameraController->SelectView(m_pViewContainer->GetView("UpperCenter"));
+	} else if(nChar == 0x32) {
+		m_pCameraController->SelectView(m_pViewContainer->GetView("UpperRight"));
+	} else if(nChar == 0x33) {
+		m_pCameraController->SelectView(m_pViewContainer->GetView("LowerLeft"));
+	} else if(nChar == 0x34) {
+		m_pCameraController->SelectView(m_pViewContainer->GetView("LowerRight"));
+	}
+
 	m_pCameraController->OnKeyDown(nChar, nRepCnt, nFlags);
 }
  

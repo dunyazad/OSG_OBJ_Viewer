@@ -19,6 +19,9 @@
     <Filter Include="DIORCO\Util">
       <UniqueIdentifier>{c1da1949-e9c6-4872-8c8a-043611de1dc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DIORCO\View">
+      <UniqueIdentifier>{8b17380c-d114-46c0-a5a2-035b89941917}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -78,6 +81,15 @@
     <ClInclude Include="RTT.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="DIORCO\View\RTTView.h">
+      <Filter>DIORCO\View</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\View\RTTViewContainer.h">
+      <Filter>DIORCO\View</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\View\View.h">
+      <Filter>DIORCO\View</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OSG_OBJ_Viewer.cpp">
@@ -115,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="RTT.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\View\RTTView.cpp">
+      <Filter>DIORCO\View</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\View\RTTViewContainer.cpp">
+      <Filter>DIORCO\View</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

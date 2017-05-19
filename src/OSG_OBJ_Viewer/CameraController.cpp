@@ -1,18 +1,18 @@
 #include "StdAfx.h"
 #include "CameraController.h"
-#include "RTT.h"
+#include <DIORCO/View/View.h>
 
-CameraController::CameraController(osgViewer::Viewer* pViewer, osg::Group* pRoot, osg::ref_ptr<osg::Camera> pCamera) : m_pViewer(pViewer), m_pRoot(pRoot), m_pMainCamera(pCamera)
+CameraController::CameraController() : m_pSelectedCameraInfo(nullptr)
 {
-	m_target = osg::Vec3(0, 0, 0);
-	m_up = osg::Vec3(0, 0, 1);
-	m_angleH = 0;
-	m_angleV = 45;
-	m_distance = 50;
+	//m_target = osg::Vec3(0, 0, 0);
+	//m_up = osg::Vec3(0, 0, 1);
+	//m_angleH = 0;
+	//m_angleV = 45;
+	//m_distance = 50;
 
-	m_lButtonDown = false;
-	m_mButtonDown = false;
-	m_rButtonDown = false;
+	//m_lButtonDown = false;
+	//m_mButtonDown = false;
+	//m_rButtonDown = false;
 
 
 
@@ -24,43 +24,28 @@ CameraController::CameraController(osgViewer::Viewer* pViewer, osg::Group* pRoot
 	//m_pCubePAT->addChild(m_pCubeGeode);
 	//m_pRoot->addChild(m_pCubePAT);
 
-
-	this->ApplyChange();
+//	this->ApplyChange();
 }
 
-CameraController::~CameraController(void)
+CameraController::~CameraController()
 {
 }
 
 void CameraController::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	osg::Vec3 dir = m_target - m_position;
+	osg::Vec3 dir = m_pSelectedCameraInfo->target - m_pSelectedCameraInfo->position;
 	dir.normalize();
 
-	osg::Vec3 right = dir ^ m_up;
+	osg::Vec3 right = dir ^ m_pSelectedCameraInfo->up;
 
 	if(nChar == 'A' || nChar == 'a') {
-		//m_target -= right;
-
-		auto kvp = m_RTTInfooMap.begin();
-		auto end = m_RTTInfooMap.end();
-		for(; kvp != end; kvp++) {
-			auto position = (*kvp).second->GetCameraPosition() - right * 2;
-			(*kvp).second->SetCameraPosition(position.x(), position.y(), position.z());
-		}
+		m_pSelectedCameraInfo->target -= right;
 	} else if(nChar == 'D' || nChar == 'd') {
-		//m_target += right;
-
-		auto kvp = m_RTTInfooMap.begin();
-		auto end = m_RTTInfooMap.end();
-		for(; kvp != end; kvp++) {
-			auto position = (*kvp).second->GetCameraPosition() + right * 2;
-			(*kvp).second->SetCameraPosition(position.x(), position.y(), position.z());
-		}
+		m_pSelectedCameraInfo->target += right;
 	} else if(nChar == 'W' || nChar == 'w') {
-		m_target += dir;
+		m_pSelectedCameraInfo->target += dir;
 	} else if(nChar == 'S' || nChar == 's') {
-		m_target -= dir;
+		m_pSelectedCameraInfo->target -= dir;
 	}
 
 	this->ApplyChange();
@@ -72,8 +57,8 @@ void CameraController::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 }
 void CameraController::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	m_lButtonDown = true;
-	m_lastLButtonPosition = point;
+	m_pSelectedCameraInfo->lButtonDown = true;
+	m_pSelectedCameraInfo->lastLButtonPosition = point;
 	this->ApplyChange();
 }
 
@@ -87,89 +72,117 @@ void CameraController::OnLButtonUp(UINT nFlags, CPoint point)
 	//	AfxMessageBox(L"Pick");
 	//}
 
-	m_lButtonDown = false;
+	m_pSelectedCameraInfo->lButtonDown = false;
 	this->ApplyChange();
 }
 
 void CameraController::OnMButtonDown(UINT nFlags, CPoint point)
 {
-	m_mButtonDown = true;
-	m_lastMButtonPosition = point;
+	m_pSelectedCameraInfo->mButtonDown = true;
+	m_pSelectedCameraInfo->lastMButtonPosition = point;
 	this->ApplyChange();
 }
 
 void CameraController::OnMButtonUp(UINT nFlags, CPoint point)
 {
-	m_mButtonDown = false;
+	m_pSelectedCameraInfo->mButtonDown = false;
 	this->ApplyChange();
 }
 
 void CameraController::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	m_rButtonDown = true;
-	m_lastRButtonPosition = point;
+	m_pSelectedCameraInfo->rButtonDown = true;
+	m_pSelectedCameraInfo->lastRButtonPosition = point;
 	this->ApplyChange();
 }
 
 void CameraController::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	m_rButtonDown = false;
+	m_pSelectedCameraInfo->rButtonDown = false;
 	this->ApplyChange();
 }
 
 void CameraController::OnMouseMove(UINT nFlags, CPoint point)
 {
-	CPoint delta = m_lastMousePosition - point;
+	CPoint delta = m_pSelectedCameraInfo->lastMousePosition - point;
 
-	osg::Vec3 dir = m_target - m_position;
+	osg::Vec3 dir = m_pSelectedCameraInfo->target - m_pSelectedCameraInfo->position;
 	dir.normalize();
-	osg::Vec3 right = dir ^ m_up;
+	osg::Vec3 right = dir ^ m_pSelectedCameraInfo->up;
 
-	if(m_lButtonDown) {
-	} else if(m_mButtonDown) {
-		m_target += right * delta.x * 0.25;
-		m_target -= m_up * delta.y * 0.25;
-	} else if(m_rButtonDown) {
-		m_angleH += delta.x * 0.5;
-		m_angleV -= delta.y * 0.5;
+	if(m_pSelectedCameraInfo->lButtonDown) {
+	} else if(m_pSelectedCameraInfo->mButtonDown) {
+		m_pSelectedCameraInfo->target += right * delta.x * 0.25;
+		m_pSelectedCameraInfo->target -= m_pSelectedCameraInfo->up * delta.y * 0.25;
+	} else if(m_pSelectedCameraInfo->rButtonDown) {
+		m_pSelectedCameraInfo->angleH += delta.x * 0.5;
+		m_pSelectedCameraInfo->angleV -= delta.y * 0.5;
 
-		if(m_angleV > 89) m_angleV = 89;
-		if(m_angleV < -89) m_angleV = -89;
+		if(m_pSelectedCameraInfo->angleV > 89) m_pSelectedCameraInfo->angleV = 89;
+		if(m_pSelectedCameraInfo->angleV < -89) m_pSelectedCameraInfo->angleV = -89;
 	}
 
 	this->ApplyChange();
 
-	m_lastMousePosition = point;
+	m_pSelectedCameraInfo->lastMousePosition = point;
 }
 
 void CameraController::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	float delta = m_distance * 0.025;
+	float delta = m_pSelectedCameraInfo->distance * 0.025;
 	if(nFlags & MK_SHIFT) delta *= 10;
 
 	if(zDelta > 0) {
-		m_distance -= delta;
+		m_pSelectedCameraInfo->distance -= delta;
 	} else if(zDelta < 0) {
-		m_distance += delta;
+		m_pSelectedCameraInfo->distance += delta;
 	}
 
 	this->ApplyChange();
 }
 
-void CameraController::AddRTT(std::string& name, RTT* pRTT)
+void CameraController::RegisterView(DIORCO::RTTView* pView)
 {
-	m_RTTInfooMap[name] = pRTT;
+	if(m_cameraInfos.count(pView) == 0) {
+		CameraInfo info;
+		info.pMainCamera = pView->GetCamera().get();
+		info.target = osg::Vec3(0, 0, 0);
+		info.up = osg::Vec3(0, 0, 1);
+		info.angleH = 0;
+		info.angleV = 45;
+		info.distance = 50;
+		info.lButtonDown = false;
+		info.mButtonDown = false;
+		info.rButtonDown = false;
+		m_cameraInfos[pView] = info;
+
+		if(m_pSelectedCameraInfo == nullptr) {
+			this->SelectView(pView);
+		}
+	}
+}
+
+void CameraController::RegisterView(osg::ref_ptr<DIORCO::RTTView> pView)
+{
+	this->RegisterView(pView.get());
+}
+
+void CameraController::SelectView(DIORCO::RTTView* pView)
+{
+	m_pSelectedCameraInfo = &m_cameraInfos[pView];
 }
 
 void CameraController::ApplyChange()
 {
-	osg::Matrix mH = osg::Matrix::rotate(osg::DegreesToRadians(m_angleH), osg::Vec3(0, 0, 1));
-	osg::Matrix mV = osg::Matrix::rotate(osg::DegreesToRadians(m_angleV), osg::Vec3(1, 0, 0));
-	m_position = m_target + osg::Vec3(0, m_distance, 0) * mV * mH;
+	osg::Matrix mH = osg::Matrix::rotate(osg::DegreesToRadians(m_pSelectedCameraInfo->angleH), osg::Vec3(0, 0, 1));
+	osg::Matrix mV = osg::Matrix::rotate(osg::DegreesToRadians(m_pSelectedCameraInfo->angleV), osg::Vec3(1, 0, 0));
+	m_pSelectedCameraInfo->position = m_pSelectedCameraInfo->target + osg::Vec3(0, m_pSelectedCameraInfo->distance, 0) * mV * mH;
 
-	m_up.normalize();
+	m_pSelectedCameraInfo->up.normalize();
 
-	m_pMainCamera->setViewMatrixAsLookAt( m_position, m_target, m_up );
+	if(m_pSelectedCameraInfo->pMainCamera) {
+		m_pSelectedCameraInfo->pMainCamera->setViewMatrixAsLookAt(m_pSelectedCameraInfo->position, m_pSelectedCameraInfo->target, m_pSelectedCameraInfo->up );
+	}
 
 	//m_pCubePAT->setPosition(m_target);
 }

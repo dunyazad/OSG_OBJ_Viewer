@@ -2,17 +2,34 @@
 
 #include "OSG_Common.h"
 
-class RTT;
+namespace DIORCO {
+	class RTTView;
+}
 
-struct RTTInfo {
-	RTT* pRTT;
+struct CameraInfo {
+	osg::ref_ptr<osg::Camera> pMainCamera;
+	osg::Vec3d target;
+	osg::Vec3d position;
+	osg::Vec3d up;
+
+	double angleH;
+	double angleV;
+	double distance;
+
+	bool lButtonDown;
+	bool mButtonDown;
+	bool rButtonDown;
+	CPoint lastLButtonPosition;
+	CPoint lastMButtonPosition;
+	CPoint lastRButtonPosition;
+	CPoint lastMousePosition;
 };
 
 class CameraController
 {
 public:
-	CameraController(osgViewer::Viewer* pViewer, osg::Group* pRoot, osg::ref_ptr<osg::Camera> pCamera);
-	~CameraController(void);
+	CameraController();
+	~CameraController();
 
 	void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -25,33 +42,13 @@ public:
 	void OnMouseMove(UINT nFlags, CPoint point);
 	void OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
-	void AddRTT(std::string& name, RTT* pRTT);
+	void RegisterView(DIORCO::RTTView* pView);
+	void RegisterView(osg::ref_ptr<DIORCO::RTTView> pView);
+	void SelectView(DIORCO::RTTView* pView);
 
 private:
-	std::map<std::string, RTT*> m_RTTInfooMap;
-	osg::ref_ptr<osg::Camera> m_pMainCamera;
-	osg::Vec3d m_target;
-	osg::Vec3d m_position;
-	osg::Vec3d m_up;
-
-	double m_angleH;
-	double m_angleV;
-	double m_distance;
-	bool m_lButtonDown;
-	bool m_mButtonDown;
-	bool m_rButtonDown;
-	CPoint m_lastLButtonPosition;
-	CPoint m_lastMButtonPosition;
-	CPoint m_lastRButtonPosition;
-	CPoint m_lastMousePosition;
-
-	osgViewer::Viewer* m_pViewer;
-	osg::Group* m_pRoot;
-	osg::ref_ptr<osg::Box> m_pCube;
-	osg::ref_ptr<osg::ShapeDrawable> m_pCubeDrawable;
-	osg::ref_ptr<osg::Geode> m_pCubeGeode;
-	osg::ref_ptr<osg::PositionAttitudeTransform> m_pCubePAT;
-
+	std::map<DIORCO::RTTView*, CameraInfo> m_cameraInfos;
+	CameraInfo* m_pSelectedCameraInfo;
 	void ApplyChange();
 };
 

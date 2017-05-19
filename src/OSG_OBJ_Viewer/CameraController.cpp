@@ -156,6 +156,8 @@ void CameraController::RegisterView(DIORCO::RTTView* pView)
 		info.rButtonDown = false;
 		m_cameraInfos[pView] = info;
 
+		this->ApplyChange(pView);
+
 		if(m_pSelectedCameraInfo == nullptr) {
 			this->SelectView(pView);
 		}
@@ -185,6 +187,21 @@ void CameraController::ApplyChange()
 	}
 
 	//m_pCubePAT->setPosition(m_target);
+}
+
+void CameraController::ApplyChange(DIORCO::RTTView* pView)
+{
+	auto cameraInfo = m_cameraInfos[pView];
+
+	osg::Matrix mH = osg::Matrix::rotate(osg::DegreesToRadians(cameraInfo.angleH), osg::Vec3(0, 0, 1));
+	osg::Matrix mV = osg::Matrix::rotate(osg::DegreesToRadians(cameraInfo.angleV), osg::Vec3(1, 0, 0));
+	cameraInfo.position = cameraInfo.target + osg::Vec3(0, cameraInfo.distance, 0) * mV * mH;
+
+	cameraInfo.up.normalize();
+
+	if(cameraInfo.pMainCamera) {
+		cameraInfo.pMainCamera->setViewMatrixAsLookAt(cameraInfo.position, cameraInfo.target, cameraInfo.up );
+	}
 }
 
 //void pick()

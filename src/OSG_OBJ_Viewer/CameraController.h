@@ -23,6 +23,8 @@ struct CameraInfo {
 	CPoint lastMButtonPosition;
 	CPoint lastRButtonPosition;
 	CPoint lastMousePosition;
+
+	bool enabled;
 };
 
 class CameraController
@@ -50,5 +52,6 @@ private:
 	std::map<DIORCO::RTTView*, CameraInfo> m_cameraInfos;
 	CameraInfo* m_pSelectedCameraInfo;
 	void ApplyChange();
+	void ApplyChange(DIORCO::RTTView* pView);
 };
 

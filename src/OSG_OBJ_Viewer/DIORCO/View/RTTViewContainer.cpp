@@ -86,7 +86,7 @@ namespace DIORCO {
 
 	osg::ref_ptr<RTTView> RTTViewContainer::GetView(const string& name)
 	{
-		if(m_views.count(name) == 0) {
+		if(m_views.count(name) != 0) {
 			return m_views[name];
 		}
 		return nullptr;

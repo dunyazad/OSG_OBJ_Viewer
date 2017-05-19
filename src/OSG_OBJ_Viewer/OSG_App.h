@@ -56,6 +56,40 @@ private:
 
 	osg::ref_ptr<osg::Group> m_pRoot;
 	osg::ref_ptr<osg::MatrixTransform> m_pMainObject;
+
+	osg::ref_ptr<osg::MatrixTransform> m_pMxGroup;
+	osg::ref_ptr<osg::MatrixTransform> m_pMxBone;
+	osg::ref_ptr<osg::MatrixTransform> m_pT11;
+	osg::ref_ptr<osg::MatrixTransform> m_pT12;
+	osg::ref_ptr<osg::MatrixTransform> m_pT13;
+	osg::ref_ptr<osg::MatrixTransform> m_pT14;
+	osg::ref_ptr<osg::MatrixTransform> m_pT15;
+	osg::ref_ptr<osg::MatrixTransform> m_pT16;
+	osg::ref_ptr<osg::MatrixTransform> m_pT17;
+	osg::ref_ptr<osg::MatrixTransform> m_pT21;
+	osg::ref_ptr<osg::MatrixTransform> m_pT22;
+	osg::ref_ptr<osg::MatrixTransform> m_pT23;
+	osg::ref_ptr<osg::MatrixTransform> m_pT24;
+	osg::ref_ptr<osg::MatrixTransform> m_pT25;
+	osg::ref_ptr<osg::MatrixTransform> m_pT26;
+	osg::ref_ptr<osg::MatrixTransform> m_pT27;
+
+	osg::ref_ptr<osg::MatrixTransform> m_pMdGroup;
+	osg::ref_ptr<osg::MatrixTransform> m_pMdBone;
+	osg::ref_ptr<osg::MatrixTransform> m_pT31;
+	osg::ref_ptr<osg::MatrixTransform> m_pT32;
+	osg::ref_ptr<osg::MatrixTransform> m_pT33;
+	osg::ref_ptr<osg::MatrixTransform> m_pT34;
+	osg::ref_ptr<osg::MatrixTransform> m_pT35;
+	osg::ref_ptr<osg::MatrixTransform> m_pT36;
+	osg::ref_ptr<osg::MatrixTransform> m_pT37;
+	osg::ref_ptr<osg::MatrixTransform> m_pT41;
+	osg::ref_ptr<osg::MatrixTransform> m_pT42;
+	osg::ref_ptr<osg::MatrixTransform> m_pT43;
+	osg::ref_ptr<osg::MatrixTransform> m_pT44;
+	osg::ref_ptr<osg::MatrixTransform> m_pT45;
+	osg::ref_ptr<osg::MatrixTransform> m_pT46;
+	osg::ref_ptr<osg::MatrixTransform> m_pT47;
 	
 	osg::ref_ptr<osg::MatrixTransform> m_pAxisIndicator;
 	osg::ref_ptr<osg::MatrixTransform> m_pObjectMaipulator;

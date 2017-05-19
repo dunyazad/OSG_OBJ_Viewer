@@ -41,10 +41,12 @@ void OSG_App::InitModels()
 
 #define ___CUSTOM_LOADER___
 #ifdef ___CUSTOM_LOADER___
-	m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
+	//m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
 	//m_pMainObject = LoadObjFile("..\\..\\res\\Init\\Init.obj", "..\\..\\res\\Init", true, 0.1f);
-	m_pMainObject->setNodeMask(0x02);
-	m_pRoot->addChild(m_pMainObject.get());
+	
+	//m_pRoot->addChild(m_pMainObject.get());
+	//m_pMainObject = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MdBone_7780.obj", "..\\..\\res\\SSModel_0_7780_0", true, 0.1f);
+	//m_pRoot->addChild(m_pMainObject.get());
 #else
 	osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\F-15K\\F-15K.obj");
 	//osg::ref_ptr<osg::Node> m_pTargetObjectModel = this->LoadModel("..\\..\\res\\Init\\Init.obj");
@@ -52,6 +54,73 @@ void OSG_App::InitModels()
 	osg::Matrix scale = osg::Matrix::scale(0.5, 0.5, 0.5);
 	m_pMainObject->setMatrix(scale);
 #endif
+
+	m_pMxGroup = new osg::MatrixTransform();
+	m_pRoot->addChild(m_pMxGroup);
+	m_pMxBone = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MxBone_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pMxBone);
+	m_pT11 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t11_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT11);
+	m_pT12 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t12_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT12);
+	m_pT13 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t13_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT13);
+	m_pT14 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t14_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT14);
+	m_pT15 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t15_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT15);
+	m_pT16 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t16_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT16);
+	m_pT17 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t17_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT17);
+	m_pT21 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t21_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT21);
+	m_pT22 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t22_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT22);
+	m_pT23 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t23_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT23);
+	m_pT24 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t24_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT24);
+	m_pT25 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t25_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT25);
+	m_pT26 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t26_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT26);
+	m_pT27 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t27_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMxGroup->addChild(m_pT27);
+
+	m_pMdGroup = new osg::MatrixTransform();
+	m_pRoot->addChild(m_pMdGroup);
+	m_pMdBone = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MdBone_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pMdBone);
+	m_pT31 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t31_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT31);
+	m_pT32 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t32_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT32);
+	m_pT33 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t33_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT33);
+	m_pT34 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t34_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT34);
+	m_pT35 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t35_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT35);
+	m_pT36 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t36_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT36);
+	m_pT37 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t37_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT37);
+	m_pT41 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t41_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT41);
+	m_pT42 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t42_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT42);
+	m_pT43 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t43_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT43);
+	m_pT44 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t44_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT44);
+	m_pT45 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t45_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT45);
+	m_pT46 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t46_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT46);
+	m_pT47 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t47_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	m_pMdGroup->addChild(m_pT47);
+
 }
  
  
@@ -219,15 +288,15 @@ osg::ref_ptr<osg::Node> OSG_App::LoadModel(std::string filename)
  
 void OSG_App::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if(nChar == 0x30) {
+	if(nChar == 49) {
 		m_pCameraController->SelectView(m_pViewContainer->GetView("UpperLeft"));
-	} else if(nChar == 0x31) {
+	} else if(nChar == 50) {
 		m_pCameraController->SelectView(m_pViewContainer->GetView("UpperCenter"));
-	} else if(nChar == 0x32) {
+	} else if(nChar == 51) {
 		m_pCameraController->SelectView(m_pViewContainer->GetView("UpperRight"));
-	} else if(nChar == 0x33) {
+	} else if(nChar == 52) {
 		m_pCameraController->SelectView(m_pViewContainer->GetView("LowerLeft"));
-	} else if(nChar == 0x34) {
+	} else if(nChar == 53) {
 		m_pCameraController->SelectView(m_pViewContainer->GetView("LowerRight"));
 	}
 
@@ -353,6 +422,8 @@ osg::ref_ptr<osg::MatrixTransform> OSG_App::LoadObjFile(const std::string& objFi
 				//map_Kd->setInternalFormatMode(osg::Texture2D::USE_S3TC_DXT1_COMPRESSION);
 				//map_Kd->setUnRefImageDataAfterApply(true);
 				osgTextures.push_back(map_Kd);
+
+				osgMaterial->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
 			} else {
 				osgTextures.push_back(nullptr);
 			}

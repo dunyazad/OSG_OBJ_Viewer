@@ -114,6 +114,7 @@
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="DIORCO\CustomOBJLoader.h" />
     <ClInclude Include="DIORCO\DIORCO_Common.h" />
+    <ClInclude Include="DIORCO\MultiControllerSet.h" />
     <ClInclude Include="DIORCO\tiny_obj_loader.h" />
     <ClInclude Include="DIORCO\Util\DebugConsoleWindow.h" />
     <ClInclude Include="DIORCO\Util\TimeWatch.h" />
@@ -135,6 +136,7 @@
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="DIORCO\CustomOBJLoader.cpp" />
     <ClCompile Include="DIORCO\DIORCO_Common.cpp" />
+    <ClCompile Include="DIORCO\MultiControllerSet.cpp" />
     <ClCompile Include="DIORCO\tiny_obj_loader.cc" />
     <ClCompile Include="DIORCO\Util\DebugConsoleWindow.cpp" />
     <ClCompile Include="DIORCO\Util\TimeWatch.cpp" />

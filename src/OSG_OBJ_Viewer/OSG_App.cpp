@@ -8,13 +8,13 @@
 OSG_App::OSG_App(HWND hWnd) : m_hWnd(hWnd)
 {
 }
- 
+
 OSG_App::~OSG_App()
 {
 	mViewer->setDone(true);
 	Sleep(1000);
 	mViewer->stopThreading();
- 
+
 	auto i = m_pRTTs.begin();
 	auto e = m_pRTTs.end();
 	for(;i != e; i++) {
@@ -22,18 +22,20 @@ OSG_App::~OSG_App()
 	}
 
 	delete mViewer;
- 
+
 	if(m_pCameraController) delete m_pCameraController;
 }
- 
+
 void OSG_App::Initialize()
 {
 	InitScene();
 	InitCameraConfig();
 	InitLight();
 	InitModels();
+
+	m_pMultiControllerSet = new DIORCO::MultiControllerSet(m_pRoot, m_pCameraMain);
 }
- 
+
 void OSG_App::InitModels()
 {
 	m_pMainObject = new osg::MatrixTransform;
@@ -41,10 +43,10 @@ void OSG_App::InitModels()
 
 #define ___CUSTOM_LOADER___
 #ifdef ___CUSTOM_LOADER___
-	//m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
+	m_pMainObject = LoadObjFile("..\\..\\res\\F-15K\\F-15K.obj", "..\\..\\res\\F-15K", true, 0.001f);
 	//m_pMainObject = LoadObjFile("..\\..\\res\\Init\\Init.obj", "..\\..\\res\\Init", true, 0.1f);
-	
-	//m_pRoot->addChild(m_pMainObject.get());
+
+	m_pRoot->addChild(m_pMainObject.get());
 	//m_pMainObject = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MdBone_7780.obj", "..\\..\\res\\SSModel_0_7780_0", true, 0.1f);
 	//m_pRoot->addChild(m_pMainObject.get());
 #else
@@ -55,80 +57,80 @@ void OSG_App::InitModels()
 	m_pMainObject->setMatrix(scale);
 #endif
 
-	m_pMxGroup = new osg::MatrixTransform();
-	m_pRoot->addChild(m_pMxGroup);
-	m_pMxBone = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MxBone_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pMxBone);
-	m_pT11 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t11_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT11);
-	m_pT12 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t12_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT12);
-	m_pT13 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t13_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT13);
-	m_pT14 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t14_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT14);
-	m_pT15 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t15_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT15);
-	m_pT16 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t16_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT16);
-	m_pT17 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t17_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT17);
-	m_pT21 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t21_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT21);
-	m_pT22 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t22_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT22);
-	m_pT23 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t23_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT23);
-	m_pT24 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t24_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT24);
-	m_pT25 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t25_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT25);
-	m_pT26 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t26_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT26);
-	m_pT27 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t27_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMxGroup->addChild(m_pT27);
+	//m_pMxGroup = new osg::MatrixTransform();
+	//m_pRoot->addChild(m_pMxGroup);
+	//m_pMxBone = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MxBone_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pMxBone);
+	//m_pT11 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t11_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT11);
+	//m_pT12 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t12_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT12);
+	//m_pT13 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t13_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT13);
+	//m_pT14 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t14_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT14);
+	//m_pT15 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t15_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT15);
+	//m_pT16 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t16_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT16);
+	//m_pT17 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t17_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT17);
+	//m_pT21 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t21_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT21);
+	//m_pT22 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t22_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT22);
+	//m_pT23 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t23_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT23);
+	//m_pT24 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t24_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT24);
+	//m_pT25 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t25_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT25);
+	//m_pT26 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t26_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT26);
+	//m_pT27 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t27_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMxGroup->addChild(m_pT27);
 
-	m_pMdGroup = new osg::MatrixTransform();
-	m_pRoot->addChild(m_pMdGroup);
-	m_pMdBone = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MdBone_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pMdBone);
-	m_pT31 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t31_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT31);
-	m_pT32 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t32_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT32);
-	m_pT33 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t33_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT33);
-	m_pT34 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t34_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT34);
-	m_pT35 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t35_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT35);
-	m_pT36 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t36_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT36);
-	m_pT37 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t37_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT37);
-	m_pT41 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t41_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT41);
-	m_pT42 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t42_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT42);
-	m_pT43 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t43_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT43);
-	m_pT44 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t44_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT44);
-	m_pT45 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t45_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT45);
-	m_pT46 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t46_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT46);
-	m_pT47 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t47_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
-	m_pMdGroup->addChild(m_pT47);
+	//m_pMdGroup = new osg::MatrixTransform();
+	//m_pRoot->addChild(m_pMdGroup);
+	//m_pMdBone = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\MdBone_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pMdBone);
+	//m_pT31 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t31_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT31);
+	//m_pT32 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t32_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT32);
+	//m_pT33 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t33_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT33);
+	//m_pT34 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t34_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT34);
+	//m_pT35 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t35_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT35);
+	//m_pT36 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t36_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT36);
+	//m_pT37 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t37_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT37);
+	//m_pT41 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t41_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT41);
+	//m_pT42 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t42_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT42);
+	//m_pT43 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t43_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT43);
+	//m_pT44 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t44_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT44);
+	//m_pT45 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t45_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT45);
+	//m_pT46 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t46_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT46);
+	//m_pT47 = LoadObjFile("..\\..\\res\\SSModel_0_7780_0\\local_t47_7780.OBJ", "..\\..\\res\\SSModel_0_7780_0", false, 0.1f);
+	//m_pMdGroup->addChild(m_pT47);
 
 }
- 
- 
+
+
 void OSG_App::InitScene()
 {
 	m_pRoot = new osg::Group();
 }
- 
+
 void OSG_App::InitLight()
 {
 	this->CreateLight(0, osg::Vec4(-100, -100, -100, 1), osg::Vec3(-1, -1, -1));
@@ -140,7 +142,7 @@ void OSG_App::InitLight()
 	this->CreateLight(6, osg::Vec4(100, -100, 100, 1), osg::Vec3(1, -1, 1));
 	this->CreateLight(7, osg::Vec4(100, 100, 100, 1), osg::Vec3(1, 1, 1));
 }
- 
+
 osg::ref_ptr<osg::PositionAttitudeTransform> OSG_App::CreateLight(int index, osg::Vec4 position, osg::Vec3 direction)
 {
 	osg::ref_ptr<osg::Light> light = new osg::Light();
@@ -150,29 +152,29 @@ osg::ref_ptr<osg::PositionAttitudeTransform> OSG_App::CreateLight(int index, osg
 	light->setDiffuse(osg::Vec4(1.0, 1.0, 1.0, 1.0));
 	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
 	light->setAmbient(osg::Vec4(0.0, 0.0, 0.0, 1.0));
- 
+
 	osg::ref_ptr<osg::StateSet> lightStateSet = m_pRoot->getOrCreateStateSet();
- 
+
 	osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource();
 	lightSource->setLight(light);
 	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
 	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
- 
+
 	osg::ref_ptr<osg::PositionAttitudeTransform> lightTransform = new osg::PositionAttitudeTransform();
 	lightTransform->addChild(lightSource);
- 
+
 	m_pRoot->addChild(lightTransform);
- 
+
 	return lightTransform;
 }
- 
+
 void OSG_App::InitCameraConfig()
 {
 	mViewer = new osgViewer::Viewer();
- 
+
 	// Add a Stats Handler to the viewer
 	//mViewer->addEventHandler(new osgViewer::StatsHandler);
- 
+
 	m_pViewContainer = new DIORCO::RTTViewContainer(m_hWnd, mViewer);
 	m_pCameraController = new CameraController();
 
@@ -217,32 +219,32 @@ void OSG_App::InitCameraConfig()
 	}
 
 	mViewer->setCamera(m_pViewContainer->GetCameraMain().get());
- 
+
 	mViewer->setSceneData(m_pRoot.get());
 
 	mViewer->realize();
 }
- 
+
 void OSG_App::PreFrameUpdate()
 {
 	// Due any preframe updates in this routine
 }
- 
+
 void OSG_App::PostFrameUpdate()
 {
 	// Due any postframe updates in this routine
 }
- 
+
 /*void OSG_App::Render(void* ptr)
 {
 OSG_App* osg = (OSG_App*)ptr;
- 
+
 osgViewer::Viewer* viewer = osg->getViewer();
- 
+
 // You have two options for the main viewer loop
 //      viewer->run()   or
 //      while(!viewer->done()) { viewer->frame(); }
- 
+
 //viewer->run();
 while(!viewer->done())
 {
@@ -251,15 +253,15 @@ viewer->frame();
 osg->PostFrameUpdate();
 //Sleep(10);         // Use this command if you need to allow other processes to have cpu time
 }
- 
+
 // For some reason this has to be here to avoid issue:
 // if you have multiple OSG windows up
 // and you exit one then all stop rendering
 AfxMessageBox("Exit Rendering Thread");
- 
+
 _endthread();
 }*/
- 
+
 osg::ref_ptr<osg::Node> OSG_App::LoadModel(std::string filename)
 {
 	DIORCO::TimeWatch tm_loading;
@@ -272,7 +274,7 @@ osg::ref_ptr<osg::Node> OSG_App::LoadModel(std::string filename)
 		return nullptr;
 	}
 	//model->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
- 
+
 	// Optimize the model
 	osgUtil::Optimizer optimizer;
 	optimizer.optimize(model.get());
@@ -282,10 +284,10 @@ osg::ref_ptr<osg::Node> OSG_App::LoadModel(std::string filename)
 	tm_loading.end();
 
 	printf("osgDB Loading time: %d [ms]\n", (int)tm_loading.msec());
- 
+
 	return model;
 }
- 
+
 void OSG_App::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	if(nChar == 49) {
@@ -302,52 +304,61 @@ void OSG_App::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	m_pCameraController->OnKeyDown(nChar, nRepCnt, nFlags);
 }
- 
+
 void OSG_App::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	m_pCameraController->OnKeyUp(nChar, nRepCnt, nFlags);
+	m_pMultiControllerSet->OnKeyUp(nChar, nRepCnt, nFlags);
 }
- 
+
 void OSG_App::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnLButtonDown(nFlags, point);
+	m_pMultiControllerSet->OnLButtonDown(nFlags, point);
 }
- 
+
 void OSG_App::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnLButtonUp(nFlags, point);
+	m_pMultiControllerSet->OnLButtonUp(nFlags, point);
 }
- 
+
 void OSG_App::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnMButtonDown(nFlags, point);
+	m_pMultiControllerSet->OnMButtonDown(nFlags, point);
 }
- 
+
 void OSG_App::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnMButtonUp(nFlags, point);
+	m_pMultiControllerSet->OnMButtonUp(nFlags, point);
 }
- 
+
 void OSG_App::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnRButtonDown(nFlags, point);
+	m_pMultiControllerSet->OnRButtonDown(nFlags, point);
 }
- 
+
 void OSG_App::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnRButtonUp(nFlags, point);
+	m_pMultiControllerSet->OnRButtonUp(nFlags, point);
 }
- 
+
 void OSG_App::OnMouseMove(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnMouseMove(nFlags, point);
+	m_pMultiControllerSet->OnMouseMove(nFlags, point);
 }
- 
+
 void OSG_App::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	m_pCameraController->OnMouseWheel(nFlags, zDelta, pt);
+	m_pMultiControllerSet->OnMouseWheel(nFlags, zDelta, pt);
 }
- 
+
 osg::ref_ptr<osg::MatrixTransform> OSG_App::LoadObjFile(const std::string& objFileName, const std::string& baseDir, bool flipYZ, float scale)
 {
 	std::string baseDirectory = baseDir;
@@ -359,12 +370,12 @@ osg::ref_ptr<osg::MatrixTransform> OSG_App::LoadObjFile(const std::string& objFi
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 	std::map<std::string, GLuint> textures;
- 
+
 	DIORCO::TimeWatch tm_parsing;
 	DIORCO::TimeWatch tm_loading;
 	tm_parsing.start();
 	tm_loading.start();
- 
+
 	std::string err;
 	bool ret =
 		tinyobj::LoadObj(&attrib, &shapes, &materials, &err, objFileName.c_str(), baseDirectory.c_str(), true);
@@ -372,12 +383,12 @@ osg::ref_ptr<osg::MatrixTransform> OSG_App::LoadObjFile(const std::string& objFi
 		std::cerr << err << std::endl;
 	}
 	tm_parsing.end();
- 
+
 	if (!ret) {
 		std::cerr << "Failed to load " << objFileName << std::endl;
 		return nullptr;
 	}
- 
+
 	printf("CustomLoader Parsing time: %d [ms]\n", (int)tm_parsing.msec());
 
 
@@ -588,7 +599,6 @@ osg::ref_ptr<osg::MatrixTransform> OSG_App::LoadObjFile(const std::string& objFi
 	printf("CustomLoader Loading time: %d [ms]\n", (int)tm_loading.msec());
 
 
- 
+
 	return matrixTransform;
 }
-

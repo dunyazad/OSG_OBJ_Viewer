@@ -90,6 +90,9 @@
     <ClInclude Include="DIORCO\View\View.h">
       <Filter>DIORCO\View</Filter>
     </ClInclude>
+    <ClInclude Include="DIORCO\MultiControllerSet.h">
+      <Filter>DIORCO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OSG_OBJ_Viewer.cpp">
@@ -133,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="DIORCO\View\RTTViewContainer.cpp">
       <Filter>DIORCO\View</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\MultiControllerSet.cpp">
+      <Filter>DIORCO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

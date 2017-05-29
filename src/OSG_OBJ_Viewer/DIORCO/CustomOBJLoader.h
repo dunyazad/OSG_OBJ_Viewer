@@ -8,12 +8,10 @@ namespace DIORCO {
 
 class CustomOBJLoader {
 public:
-	CustomOBJLoader(const std::string& basePath);
+	CustomOBJLoader();
 	~CustomOBJLoader();
 
-	osg::ref_ptr<osg::Group> LoadObjFile(const std::string relativeFilePathFromBase);
-private:
-	std::string m_basePath;
+	static osg::ref_ptr<osg::MatrixTransform> LoadObjFile(const std::string& objFileName, const std::string& baseDir, bool flipYZ, float scale);
 };
 
 }

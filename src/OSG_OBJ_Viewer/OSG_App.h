@@ -4,6 +4,7 @@
 #include <DIORCO/DIORCO_Common.h>
 #include <DIORCO/Util/Util.h>
 #include <DIORCO/View/View.h>
+#include <DIORCO/MultiControllerSet.h>
 #include "RenderingThread.h"
 #include "CameraController.h"
 #include "RTT.h"
@@ -53,6 +54,8 @@ private:
 	osgViewer::Viewer* mViewer;
 
 	DIORCO::RTTViewContainer* m_pViewContainer;
+
+	DIORCO::MultiControllerSet* m_pMultiControllerSet;
 
 	osg::ref_ptr<osg::Group> m_pRoot;
 	osg::ref_ptr<osg::MatrixTransform> m_pMainObject;

@@ -3,8 +3,7 @@
 
 namespace DIORCO {
 
-CustomOBJLoader::CustomOBJLoader(const std::string& basePath)
-	: m_basePath(basePath)
+CustomOBJLoader::CustomOBJLoader()
 {
 }
 
@@ -12,9 +11,9 @@ CustomOBJLoader::~CustomOBJLoader()
 {
 }
 
-osg::ref_ptr<osg::Group> CustomOBJLoader::LoadObjFile(const std::string relativeFilePathFromBase)
+osg::ref_ptr<osg::MatrixTransform> CustomOBJLoader::LoadObjFile(const std::string& objFileName, const std::string& baseDir, bool flipYZ, float scale)
 {
-	std::string baseDirectory = m_basePath;
+	std::string baseDirectory = baseDir;
 	if(baseDirectory[baseDirectory.size() - 1] != '\\' || baseDirectory[baseDirectory.size() - 1] != '/') {
 		baseDirectory += '\\';
 	}
@@ -24,21 +23,21 @@ osg::ref_ptr<osg::Group> CustomOBJLoader::LoadObjFile(const std::string relative
 	std::vector<tinyobj::material_t> materials;
 	std::map<std::string, GLuint> textures;
  
-	TimeWatch tm_parsing;
-	TimeWatch tm_loading;
+	DIORCO::TimeWatch tm_parsing;
+	DIORCO::TimeWatch tm_loading;
 	tm_parsing.start();
 	tm_loading.start();
  
 	std::string err;
 	bool ret =
-		tinyobj::LoadObj(&attrib, &shapes, &materials, &err, relativeFilePathFromBase.c_str(), baseDirectory.c_str(), true);
+		tinyobj::LoadObj(&attrib, &shapes, &materials, &err, objFileName.c_str(), baseDirectory.c_str(), true);
 	if (!err.empty()) {
 		std::cerr << err << std::endl;
 	}
 	tm_parsing.end();
  
 	if (!ret) {
-		std::cerr << "Failed to load " << relativeFilePathFromBase << std::endl;
+		std::cerr << "Failed to load " << objFileName << std::endl;
 		return nullptr;
 	}
  
@@ -86,6 +85,8 @@ osg::ref_ptr<osg::Group> CustomOBJLoader::LoadObjFile(const std::string relative
 				//map_Kd->setInternalFormatMode(osg::Texture2D::USE_S3TC_DXT1_COMPRESSION);
 				//map_Kd->setUnRefImageDataAfterApply(true);
 				osgTextures.push_back(map_Kd);
+
+				osgMaterial->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
 			} else {
 				osgTextures.push_back(nullptr);
 			}
@@ -97,7 +98,7 @@ osg::ref_ptr<osg::Group> CustomOBJLoader::LoadObjFile(const std::string relative
 		}
 	}
 
-	osg::ref_ptr<osg::Group> group = new osg::Group();
+	osg::ref_ptr<osg::MatrixTransform> matrixTransform = new osg::MatrixTransform();
 
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++) {
@@ -113,10 +114,14 @@ osg::ref_ptr<osg::Group> CustomOBJLoader::LoadObjFile(const std::string relative
 				// access to vertex
 				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 				if(attrib.vertices.size() > 0) {
-					auto vx = attrib.vertices[3*idx.vertex_index+0];
-					auto vy = attrib.vertices[3*idx.vertex_index+1];
-					auto vz = attrib.vertices[3*idx.vertex_index+2];
-					osgVertices[material]->push_back(osg::Vec3(vx, vy, vz));
+					auto vx = attrib.vertices[3*idx.vertex_index+0] * scale;
+					auto vy = attrib.vertices[3*idx.vertex_index+1] * scale;
+					auto vz = attrib.vertices[3*idx.vertex_index+2] * scale;
+					if(flipYZ) {
+						osgVertices[material]->push_back(osg::Vec3(vx, vz, vy));
+					} else {
+						osgVertices[material]->push_back(osg::Vec3(vx, vy, vz));
+					}
 				}
 				if(attrib.normals.size() > 0) {
 					auto nx = attrib.normals[3*idx.normal_index+0];
@@ -136,7 +141,7 @@ osg::ref_ptr<osg::Group> CustomOBJLoader::LoadObjFile(const std::string relative
 
 	for (unsigned int materialIndex = 0; materialIndex < materials.size(); materialIndex++) {
 		osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-		group->addChild(geode);
+		matrixTransform->addChild(geode);
 		auto ss = geode->getOrCreateStateSet();
 		ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
@@ -244,8 +249,11 @@ osg::ref_ptr<osg::Group> CustomOBJLoader::LoadObjFile(const std::string relative
 	tm_loading.end();
 
 	printf("CustomLoader Loading time: %d [ms]\n", (int)tm_loading.msec());
+
+
  
-	return group;
+	return matrixTransform;
 }
+
 
 }

@@ -3,8 +3,8 @@
 
 namespace DIORCO {
 
-	RTTView::RTTView(float width, float height, osgViewer::Viewer* pViewer, osg::ref_ptr<osg::Camera> mainCamera)
-		: m_width(width), m_height(height), m_pViewer(pViewer), m_eye(10, 0, 0), m_target(0, 0, 0)
+	RTTView::RTTView(const string& name, float width, float height, osgViewer::Viewer* pViewer, osg::ref_ptr<osg::Camera> mainCamera)
+		: m_name(name), m_width(width), m_height(height), m_pViewer(pViewer), m_eye(10, 0, 0), m_target(0, 0, 0)
 	{
 		m_pCamera = new osg::Camera();
 
@@ -42,6 +42,7 @@ namespace DIORCO {
 		this->addChild(m_pGeode);
 
 		m_pGeometry = new osg::Geometry();
+		m_pGeometry->setName(name);
 		m_pGeode->addDrawable(m_pGeometry);
 
 		osg::ref_ptr<osg::Vec3Array> vertexArray = new osg::Vec3Array();
@@ -102,9 +103,11 @@ namespace DIORCO {
 		m_pCamera->setViewMatrixAsLookAt(m_eye, m_target, osg::Vec3(0, 1, 0));
 	}
 
-	void RTTView::SetImageTransform(osg::Matrix transform)
+	void RTTView::SetPosition(float x, float y)
 	{
-		this->setMatrix(transform);
+		m_x = x;
+		m_y = y;
+		this->setMatrix(osg::Matrix::translate(x, y, 0));
 	}
 
 }

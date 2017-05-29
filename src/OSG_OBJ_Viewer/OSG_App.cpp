@@ -33,7 +33,7 @@ void OSG_App::Initialize()
 	InitLight();
 	InitModels();
 
-	m_pMultiControllerSet = new DIORCO::MultiControllerSet(m_pRoot, m_pCameraMain);
+	m_pMultiControllerSet = new DIORCO::MultiControllerSet(m_pViewContainer, m_pRoot, m_pViewContainer->GetCameraMain().get());
 }
 
 void OSG_App::InitModels()
@@ -181,7 +181,7 @@ void OSG_App::InitCameraConfig()
 	{
 		auto pView = m_pViewContainer->CreateView("UpperLeft", m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 2);
 		m_pRoot->addChild(pView);
-		pView->SetImageTransform(osg::Matrix::translate(-m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 4, 0));
+		pView->SetPosition(-m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 4);
 		pView->GetCamera()->setClearColor(osg::Vec4f(1.0f, 0.7f, 0.7f, 1.0f));
 		m_pCameraController->RegisterView(pView);
 	}
@@ -189,7 +189,7 @@ void OSG_App::InitCameraConfig()
 	{
 		auto pView = m_pViewContainer->CreateView("UpperCenter", m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 2);
 		m_pRoot->addChild(pView);
-		pView->SetImageTransform(osg::Matrix::translate(0, m_pViewContainer->GetHeight() / 4, 0));
+		pView->SetPosition(0, m_pViewContainer->GetHeight() / 4);
 		pView->GetCamera()->setClearColor(osg::Vec4f(0.7f, 1.0f, 0.7f, 1.0f));
 		m_pCameraController->RegisterView(pView);
 	}
@@ -197,7 +197,7 @@ void OSG_App::InitCameraConfig()
 	{
 		auto pView = m_pViewContainer->CreateView("UpperRight", m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 2);
 		m_pRoot->addChild(pView);
-		pView->SetImageTransform(osg::Matrix::translate(m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 4, 0));
+		pView->SetPosition(m_pViewContainer->GetWidth() / 3, m_pViewContainer->GetHeight() / 4);
 		pView->GetCamera()->setClearColor(osg::Vec4f(0.7f, 0.7f, 1.0f, 1.0f));
 		m_pCameraController->RegisterView(pView);
 	}
@@ -205,7 +205,7 @@ void OSG_App::InitCameraConfig()
 	{
 		auto pView = m_pViewContainer->CreateView("LowerLeft", m_pViewContainer->GetWidth() / 2, m_pViewContainer->GetHeight() / 2);
 		m_pRoot->addChild(pView);
-		pView->SetImageTransform(osg::Matrix::translate(-m_pViewContainer->GetWidth() / 4, -m_pViewContainer->GetHeight() / 4, 0));
+		pView->SetPosition(-m_pViewContainer->GetWidth() / 4, -m_pViewContainer->GetHeight() / 4);
 		pView->GetCamera()->setClearColor(osg::Vec4f(0.3f, 0.3f, 0.3f, 1.0f));
 		m_pCameraController->RegisterView(pView);
 	}
@@ -213,7 +213,7 @@ void OSG_App::InitCameraConfig()
 	{
 		auto pView = m_pViewContainer->CreateView("LowerRight", m_pViewContainer->GetWidth() / 2, m_pViewContainer->GetHeight() / 2);
 		m_pRoot->addChild(pView);
-		pView->SetImageTransform(osg::Matrix::translate(m_pViewContainer->GetWidth() / 4, -m_pViewContainer->GetHeight() / 4, 0));
+		pView->SetPosition(m_pViewContainer->GetWidth() / 4, -m_pViewContainer->GetHeight() / 4);
 		pView->GetCamera()->setClearColor(osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 		m_pCameraController->RegisterView(pView);
 	}
@@ -308,54 +308,63 @@ void OSG_App::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void OSG_App::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	m_pCameraController->OnKeyUp(nChar, nRepCnt, nFlags);
+	m_pViewContainer->OnKeyUp(nChar, nRepCnt, nFlags);
 	m_pMultiControllerSet->OnKeyUp(nChar, nRepCnt, nFlags);
 }
 
 void OSG_App::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnLButtonDown(nFlags, point);
+	m_pViewContainer->OnLButtonDown(nFlags, point);
 	m_pMultiControllerSet->OnLButtonDown(nFlags, point);
 }
 
 void OSG_App::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnLButtonUp(nFlags, point);
+	m_pViewContainer->OnLButtonUp(nFlags, point);
 	m_pMultiControllerSet->OnLButtonUp(nFlags, point);
 }
 
 void OSG_App::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnMButtonDown(nFlags, point);
+	m_pViewContainer->OnMButtonDown(nFlags, point);
 	m_pMultiControllerSet->OnMButtonDown(nFlags, point);
 }
 
 void OSG_App::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnMButtonUp(nFlags, point);
+	m_pViewContainer->OnMButtonUp(nFlags, point);
 	m_pMultiControllerSet->OnMButtonUp(nFlags, point);
 }
 
 void OSG_App::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnRButtonDown(nFlags, point);
+	m_pViewContainer->OnRButtonDown(nFlags, point);
 	m_pMultiControllerSet->OnRButtonDown(nFlags, point);
 }
 
 void OSG_App::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnRButtonUp(nFlags, point);
+	m_pViewContainer->OnRButtonUp(nFlags, point);
 	m_pMultiControllerSet->OnRButtonUp(nFlags, point);
 }
 
 void OSG_App::OnMouseMove(UINT nFlags, CPoint point)
 {
 	m_pCameraController->OnMouseMove(nFlags, point);
+	m_pViewContainer->OnMouseMove(nFlags, point);
 	m_pMultiControllerSet->OnMouseMove(nFlags, point);
 }
 
 void OSG_App::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	m_pCameraController->OnMouseWheel(nFlags, zDelta, pt);
+	m_pViewContainer->OnMouseWheel(nFlags, zDelta, pt);
 	m_pMultiControllerSet->OnMouseWheel(nFlags, zDelta, pt);
 }
 

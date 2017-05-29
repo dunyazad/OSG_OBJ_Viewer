@@ -79,7 +79,7 @@ namespace DIORCO {
 	osg::ref_ptr<RTTView> RTTViewContainer::CreateView(const string& name, float width, float height)
 	{
 		if(m_views.count(name) == 0) {
-			m_views[name] = new RTTView(width, height, m_pViewer, m_pCameraMain);
+			m_views[name] = new RTTView(name, width, height, m_pViewer, m_pCameraMain);
 		}
 		return m_views[name];
 	}
@@ -90,6 +90,30 @@ namespace DIORCO {
 			return m_views[name];
 		}
 		return nullptr;
+	}
+
+	osg::ref_ptr<RTTView> RTTViewContainer::GetViewUnderCursor()
+	{
+		osg::ref_ptr<osgUtil::RayIntersector> picker = new osgUtil::RayIntersector(osgUtil::Intersector::WINDOW, m_mousePosition.x, m_height - m_mousePosition.y); 
+		osgUtil::IntersectionVisitor iv(picker.get()); 
+		m_pCameraMain->accept(iv); 
+		if (picker->containsIntersections()) 
+		{
+			auto i = picker->getIntersections().begin();
+			auto e = picker->getIntersections().end();
+
+			for(; i != e; i++) {
+				auto element = (*i);
+				auto pView = GetView(element.drawable->getName());
+				if(pView != nullptr) return pView;
+			}
+		}
+		return nullptr;
+	}
+
+	CPoint RTTViewContainer::WindowToView(RTTView* pView, CPoint windowPoint)
+	{
+		return CPoint(windowPoint.x / m_width * pView->GetWidth(), windowPoint.y / m_height * pView->GetHeight());
 	}
 
 	int RTTViewContainer::GetX()
@@ -112,4 +136,44 @@ namespace DIORCO {
 		return m_height;
 	}
 
+	void RTTViewContainer::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+	{
+	}
+
+	void RTTViewContainer::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+	{
+	}
+
+	void RTTViewContainer::OnLButtonDown(UINT nFlags, CPoint point)
+	{
+	}
+
+	void RTTViewContainer::OnLButtonUp(UINT nFlags, CPoint point)
+	{
+	}
+
+	void RTTViewContainer::OnMButtonDown(UINT nFlags, CPoint point)
+	{
+	}
+
+	void RTTViewContainer::OnMButtonUp(UINT nFlags, CPoint point)
+	{
+	}
+
+	void RTTViewContainer::OnRButtonDown(UINT nFlags, CPoint point)
+	{
+	}
+
+	void RTTViewContainer::OnRButtonUp(UINT nFlags, CPoint point)
+	{
+	}
+
+	void RTTViewContainer::OnMouseMove(UINT nFlags, CPoint point)
+	{
+		m_mousePosition = point;
+	}
+
+	void RTTViewContainer::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+	{
+	}
 }

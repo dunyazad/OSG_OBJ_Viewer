@@ -2,11 +2,11 @@
 #include <DIORCO/DIORCO_Common.h>
 
 namespace DIORCO {
-	class CustomOBJLoader;
+	class RTTViewContainer;
 
 	class MultiControllerSet {
 	public:
-		MultiControllerSet(osg::ref_ptr<osg::Group> pRoot, osg::ref_ptr<osg::Camera> pCamera);
+		MultiControllerSet(RTTViewContainer* pViewContainer, osg::ref_ptr<osg::Group> pRoot, osg::ref_ptr<osg::Camera> pCamera);
 		~MultiControllerSet();
 
 		void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -21,6 +21,7 @@ namespace DIORCO {
 		void OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
 	private:
+		RTTViewContainer* m_pViewContainer;
 		osg::ref_ptr<osg::Group> m_pRoot;
 		osg::ref_ptr<osg::Camera> m_pCamera;
 

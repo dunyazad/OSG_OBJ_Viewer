@@ -2,18 +2,25 @@
 
 #include "MultiControllerSet.h"
 #include "CustomOBJLoader.h"
+#include <DIORCO/View/View.h>
 
 namespace DIORCO {
-	MultiControllerSet::MultiControllerSet(osg::ref_ptr<osg::Group> pRoot, osg::ref_ptr<osg::Camera> pCamera)
-		: m_pRoot(pRoot), m_pCamera(pCamera)
+	MultiControllerSet::MultiControllerSet(RTTViewContainer* pViewContainer, osg::ref_ptr<osg::Group> pRoot, osg::ref_ptr<osg::Camera> pCamera)
+		: m_pViewContainer(pViewContainer), m_pRoot(pRoot), m_pCamera(pCamera)
 	{
 		m_pArrowTX = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTX->setName("ArrowTX");
 		m_pArrowTY = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTY->setName("ArrowTY");
 		m_pArrowTZ = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTZ->setName("ArrowTZ");
 
 		m_pArrowRX = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTX->setName("ArrowRX");
 		m_pArrowRY = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTX->setName("ArrowRY");
 		m_pArrowRZ = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTX->setName("ArrowRZ");
 
 		m_pControllerSet = new osg::MatrixTransform();
 
@@ -59,6 +66,30 @@ namespace DIORCO {
 
 	void MultiControllerSet::OnLButtonUp(UINT nFlags, CPoint point)
 	{
+		//auto pView = m_pViewContainer->GetViewUnderCursor();
+		auto pView = m_pViewContainer->GetView("UpperLeft");
+		osg::ref_ptr<osgUtil::RayIntersector> picker = new osgUtil::RayIntersector(osgUtil::Intersector::WINDOW, point.x, point.y); 
+		osgUtil::IntersectionVisitor iv(picker.get()); 
+		pView->GetCamera()->accept(iv); 
+		if (picker->containsIntersections()) 
+		{
+			auto i = picker->getIntersections().begin();
+			auto e = picker->getIntersections().end();
+
+			for(; i != e; i++) {
+				auto element = (*i);
+				std::cout << "================================================================================" << std::endl;
+				std::cout << "intersect " << element.drawable->getName() << std::endl;
+
+				auto npi = element.nodePath.begin();
+				auto npe = element.nodePath.end();
+				for(; npi != npe; npi++) {
+					std::cout << (*npi)->getName() << std::endl;
+				}
+			}
+
+			AfxMessageBox(L"Pick");
+		}
 	}
 
 	void MultiControllerSet::OnMButtonDown(UINT nFlags, CPoint point)

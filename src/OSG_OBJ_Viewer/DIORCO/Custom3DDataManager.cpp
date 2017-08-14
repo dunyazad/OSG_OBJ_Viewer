@@ -819,26 +819,53 @@ ref_ptr<Group> Custom3DDataManager::LoadSTLFile(const std::string& stlFileName, 
 	return pGroup;
 }
 
-void Custom3DDataManager::SaveObjFile(ref_ptr<Vec3Array> pVertices, const string& objFileName, bool isBinary)
+void Custom3DDataManager::SaveObjFile(ref_ptr<Vec3Array> pVertices, const string& objFileName)
 {
 	Custom3DDataFile file;
-	if(isBinary)
+	file.Open(objFileName, false);
+	file << "# " << objFileName << endl;
+
+	stringstream ssv;
+	stringstream ssvn;
+	stringstream ssf;
+
+	for	(int i = 0; i < pVertices->size(); i += 3)
 	{
+		Vec3 v1 = pVertices->at(i);
+		Vec3 v2 = pVertices->at(i + 1);
+		Vec3 v3 = pVertices->at(i + 2);
+		Vec3 d1 = v2 - v1;
+		Vec3 d2 = v3 - v1;
+		d1.normalize();
+		d2.normalize();
+		Vec3 n = d2 ^ d1;
+		n.normalize();
+
+		ssv << "v " << v1.x() << " " << v1.y() << " " << v1.z() << endl;
+		ssv << "v " << v2.x() << " " << v2.y() << " " << v2.z() << endl;
+		ssv << "v " << v3.x() << " " << v3.y() << " " << v3.z() << endl;
+
+		ssvn << "vn " << n.x() << " " << n.y() << " " << n.z() << endl;
+
+		ssf << "f " << i + 1 << "//" << (i / 3) + 1 << " " << i + 2 << "//" << (i / 3) + 1 << " " << i + 3 << "//" << (i / 3) + 1 << endl;
 	}
-	else
-	{
-		file.Open(objFileName, false);
-		file << "solid " << objFileName << endl;
-		file.Close();
-	}
+
+	file << "# Vertices" << endl;
+	file << ssv.rdbuf()->str() << endl << endl;
+	file << "# Normals" << endl;
+	file << ssvn.rdbuf()->str() << endl << endl;
+	file << "# Faces" << endl;
+	file << ssf.rdbuf()->str() << endl;
+
+	file.Close();
 }
 
-void Custom3DDataManager::SaveSTLFile(ref_ptr<Vec3Array> pVertices, const string& objFileName, bool isBinary)
+void Custom3DDataManager::SaveSTLFile(ref_ptr<Vec3Array> pVertices, const string& stlFileName, bool isBinary)
 {
 	Custom3DDataFile file;
 	if(isBinary)
 	{
-		file.Open(objFileName, true);
+		file.Open(stlFileName, true);
 		unsigned int numberOfTriangles = pVertices->getNumElements() / 3;
 		char header[80] = "Header";
 		file.Write((char*)header, 80);
@@ -880,8 +907,8 @@ void Custom3DDataManager::SaveSTLFile(ref_ptr<Vec3Array> pVertices, const string
 	}
 	else
 	{
-		file.Open(objFileName, false);
-		file << "solid " << objFileName << endl;
+		file.Open(stlFileName, false);
+		file << "solid " << stlFileName << endl;
 
 		for	(int i = 0; i < pVertices->size(); i += 3)
 		{
@@ -904,17 +931,17 @@ void Custom3DDataManager::SaveSTLFile(ref_ptr<Vec3Array> pVertices, const string
 			file << "endfacet" << endl;
 		}
 
-		file << "endsolid " << objFileName << endl;
+		file << "endsolid " << stlFileName << endl;
 
 		file.Close();
 	}
 }
 
-void Custom3DDataManager::SaveObjFile(RAW_DATA_INFO &sRawDataInfo, const string& objFileName, bool isBinary)
+void Custom3DDataManager::SaveObjFile(RAW_DATA_INFO &sRawDataInfo, const string& objFileName)
 {
 }
 
-void Custom3DDataManager::SaveSTLFile(RAW_DATA_INFO &sRawDataInfo, const string& objFileName, bool isBinary)
+void Custom3DDataManager::SaveSTLFile(RAW_DATA_INFO &sRawDataInfo, const string& stlFileName, bool isBinary)
 {
 	Custom3DDataFile file;
 	if(isBinary)
@@ -922,8 +949,10 @@ void Custom3DDataManager::SaveSTLFile(RAW_DATA_INFO &sRawDataInfo, const string&
 	}
 	else
 	{
-		file.Open(objFileName, false);
-		file << "solid " << objFileName << endl;
+		file.Open(stlFileName, false);
+		file << "solid " << stlFileName << endl;
+
+		file << "endsolid " << stlFileName << endl;
 		file.Close();
 	}
 }

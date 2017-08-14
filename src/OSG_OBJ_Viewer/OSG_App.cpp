@@ -312,7 +312,8 @@ void OSG_App::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		}
 
 		ref_ptr<Vec3Array> pVertices = new Vec3Array(vertices.begin(), vertices.end());
-		Custom3DDataManager::SaveSTLFile(pVertices, "D:\\Testb.stl", true);
+		//Custom3DDataManager::SaveSTLFile(pVertices, "D:\\Testb.stl", true);
+		Custom3DDataManager::SaveObjFile(pVertices, "D:\\ObjB.obj");
 	} 
 
 	m_pCameraController->OnKeyDown(nChar, nRepCnt, nFlags);

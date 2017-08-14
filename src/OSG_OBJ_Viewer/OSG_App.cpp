@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "OSG_App.h"
 
-#include <DIORCO/tiny_obj_loader.h>
+#include <DIORCO/Custom3DDataManager.h>
 
 OSG_App::OSG_App(HWND hWnd) : m_hWnd(hWnd)
 {
@@ -38,7 +38,6 @@ void OSG_App::Initialize()
 
 void OSG_App::InitModels()
 {
-	m_pMainObject = new osg::MatrixTransform;
 	m_pRoot->addChild(m_pMainObject.get());
 
 #define ___CUSTOM_LOADER___
@@ -300,7 +299,21 @@ void OSG_App::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		m_pCameraController->SelectView(m_pViewContainer->GetView("LowerLeft"));
 	} else if(nChar == 53) {
 		m_pCameraController->SelectView(m_pViewContainer->GetView("LowerRight"));
-	}
+	} else if(nChar == 48) {
+
+		vector<Vec3> vertices;
+
+		for(int i = 0; i < m_pMainObject->getNumChildren(); i++) {
+			auto geode = m_pMainObject->getChild(i)->asGeode();
+			for	(int j = 0; j < geode->getNumChildren(); j++) {
+				auto geometry = geode->getDrawable(j)->asGeometry();
+				vertices.insert(vertices.end(), ((Vec3Array*)geometry->getVertexArray())->begin(), ((Vec3Array*)geometry->getVertexArray())->end());
+			}
+		}
+
+		ref_ptr<Vec3Array> pVertices = new Vec3Array(vertices.begin(), vertices.end());
+		Custom3DDataManager::SaveSTLFile(pVertices, "D:\\Testb.stl", true);
+	} 
 
 	m_pCameraController->OnKeyDown(nChar, nRepCnt, nFlags);
 }

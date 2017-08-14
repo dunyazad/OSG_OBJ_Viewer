@@ -1,25 +1,25 @@
 #include "stdafx.h"
 
 #include "MultiControllerSet.h"
-#include "CustomOBJLoader.h"
+#include "Custom3DDataManager.h"
 #include <DIORCO/View/View.h>
 
 namespace DIORCO {
 	MultiControllerSet::MultiControllerSet(RTTViewContainer* pViewContainer, osg::ref_ptr<osg::Group> pRoot, osg::ref_ptr<osg::Camera> pCamera)
 		: m_pViewContainer(pViewContainer), m_pRoot(pRoot), m_pCamera(pCamera)
 	{
-		m_pArrowTX = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTX = Custom3DDataManager::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f, "ArrowTX");
 		m_pArrowTX->setName("ArrowTX");
-		m_pArrowTY = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTY = Custom3DDataManager::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f, "ArrowTY");
 		m_pArrowTY->setName("ArrowTY");
-		m_pArrowTZ = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowTZ = Custom3DDataManager::LoadObjFile("..\\..\\res\\Arrow\\ArrowT.obj", "..\\..\\res\\Arrow", true, 0.01f, "ArrowTZ");
 		m_pArrowTZ->setName("ArrowTZ");
 
-		m_pArrowRX = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowRX = Custom3DDataManager::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f, "ArrowRX");
 		m_pArrowTX->setName("ArrowRX");
-		m_pArrowRY = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowRY = Custom3DDataManager::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f, "ArrowRY");
 		m_pArrowTX->setName("ArrowRY");
-		m_pArrowRZ = DIORCO::CustomOBJLoader::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f);
+		m_pArrowRZ = Custom3DDataManager::LoadObjFile("..\\..\\res\\Arrow\\ArrowR.obj", "..\\..\\res\\Arrow", true, 0.01f, "ArrowRZ");
 		m_pArrowTX->setName("ArrowRZ");
 
 		m_pControllerSet = new osg::MatrixTransform();

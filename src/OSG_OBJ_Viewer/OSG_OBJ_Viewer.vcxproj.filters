@@ -57,9 +57,6 @@
     <ClInclude Include="CameraController.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="DIORCO\CustomOBJLoader.h">
-      <Filter>DIORCO</Filter>
-    </ClInclude>
     <ClInclude Include="DIORCO\DIORCO_Common.h">
       <Filter>DIORCO</Filter>
     </ClInclude>
@@ -93,6 +90,15 @@
     <ClInclude Include="DIORCO\MultiControllerSet.h">
       <Filter>DIORCO</Filter>
     </ClInclude>
+    <ClInclude Include="DIORCO\Custom3DDataFile.h">
+      <Filter>DIORCO</Filter>
+    </ClInclude>
+    <ClInclude Include="DIORCO\Custom3DDataManager.h">
+      <Filter>DIORCO</Filter>
+    </ClInclude>
+    <ClInclude Include="Defines.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OSG_OBJ_Viewer.cpp">
@@ -109,9 +115,6 @@
     </ClCompile>
     <ClCompile Include="CameraController.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DIORCO\CustomOBJLoader.cpp">
-      <Filter>DIORCO</Filter>
     </ClCompile>
     <ClCompile Include="DIORCO\DIORCO_Common.cpp">
       <Filter>DIORCO</Filter>
@@ -138,6 +141,12 @@
       <Filter>DIORCO\View</Filter>
     </ClCompile>
     <ClCompile Include="DIORCO\MultiControllerSet.cpp">
+      <Filter>DIORCO</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\Custom3DDataFile.cpp">
+      <Filter>DIORCO</Filter>
+    </ClCompile>
+    <ClCompile Include="DIORCO\Custom3DDataManager.cpp">
       <Filter>DIORCO</Filter>
     </ClCompile>
   </ItemGroup>

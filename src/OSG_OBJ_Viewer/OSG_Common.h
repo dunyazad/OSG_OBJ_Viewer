@@ -38,6 +38,7 @@
 #include <osgDB/FileNameUtils>
 #include <osgUtil/Optimizer>
 #include <osgUtil/RayIntersector>
+#include <osgUtil/SmoothingVisitor>
 
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>

@@ -25,12 +25,12 @@ namespace DIORCO {
 		osg::ref_ptr<osg::Group> m_pRoot;
 		osg::ref_ptr<osg::Camera> m_pCamera;
 
-		osg::ref_ptr<osg::MatrixTransform> m_pControllerSet;
-		osg::ref_ptr<osg::MatrixTransform> m_pArrowTX;
-		osg::ref_ptr<osg::MatrixTransform> m_pArrowTY;
-		osg::ref_ptr<osg::MatrixTransform> m_pArrowTZ;
-		osg::ref_ptr<osg::MatrixTransform> m_pArrowRX;
-		osg::ref_ptr<osg::MatrixTransform> m_pArrowRY;
-		osg::ref_ptr<osg::MatrixTransform> m_pArrowRZ;
+		osg::ref_ptr<osg::Group> m_pControllerSet;
+		osg::ref_ptr<osg::Group> m_pArrowTX;
+		osg::ref_ptr<osg::Group> m_pArrowTY;
+		osg::ref_ptr<osg::Group> m_pArrowTZ;
+		osg::ref_ptr<osg::Group> m_pArrowRX;
+		osg::ref_ptr<osg::Group> m_pArrowRY;
+		osg::ref_ptr<osg::Group> m_pArrowRZ;
 	};
 }

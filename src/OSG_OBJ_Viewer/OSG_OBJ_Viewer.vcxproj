@@ -112,7 +112,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraController.h" />
-    <ClInclude Include="DIORCO\CustomOBJLoader.h" />
+    <ClInclude Include="Defines.h" />
+    <ClInclude Include="DIORCO\Custom3DDataFile.h" />
+    <ClInclude Include="DIORCO\Custom3DDataManager.h" />
     <ClInclude Include="DIORCO\DIORCO_Common.h" />
     <ClInclude Include="DIORCO\MultiControllerSet.h" />
     <ClInclude Include="DIORCO\tiny_obj_loader.h" />
@@ -134,7 +136,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraController.cpp" />
-    <ClCompile Include="DIORCO\CustomOBJLoader.cpp" />
+    <ClCompile Include="DIORCO\Custom3DDataFile.cpp" />
+    <ClCompile Include="DIORCO\Custom3DDataManager.cpp" />
     <ClCompile Include="DIORCO\DIORCO_Common.cpp" />
     <ClCompile Include="DIORCO\MultiControllerSet.cpp" />
     <ClCompile Include="DIORCO\tiny_obj_loader.cc" />
